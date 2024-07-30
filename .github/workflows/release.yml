@@ -1,0 +1,36 @@
+name: goreleaser
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  goreleaser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.22.x'
+
+      - name: Install templ
+        shell: bash
+        run: go install github.com/a-h/templ/cmd/templ@latest
+      - name: Run templ generate
+        shell: bash
+        run: templ generate -path .
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: ${{ env.GITHUB_REF_NAME }}
+          args: release --clean
+          workdir: ./
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

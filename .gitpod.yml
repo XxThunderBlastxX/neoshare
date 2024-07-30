@@ -1,0 +1,22 @@
+image:
+  file: .gitpod.Dockerfile
+
+tasks:
+  # Run the project
+  - name: Run project
+    command: make watch
+
+ports:
+  - port: 8080
+    visibility: public
+    onOpen: notify
+
+jetbrains:
+  goland:
+    plugins:
+      # go linter
+      - com.ypwang.plugin.go-linter
+      # templ
+      - com.templ.templ
+      # htmx
+      - com.github.hugohomesquita.htmxjetbrains
