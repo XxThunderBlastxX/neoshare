@@ -10,7 +10,7 @@ BINARY_NAME := neoshare
 build:
 	@echo "Building binary..."
 	@templ generate
-	@pnpx tailwindcss -i cmd/web/assets/css/input.css -o cmd/web/assets/css/output.css
+	@#pnpx tailwindcss -i cmd/web/assets/css/input.css -o cmd/web/assets/css/output.css
 	@go build -o bin/$(BINARY_NAME) $(MAIN_PACKAGE)
 
 
