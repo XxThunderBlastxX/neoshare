@@ -1,0 +1,21 @@
+package layout
+
+import "github.com/XxThunderBlastxX/neoshare/cmd/web/component"
+
+templ Base() {
+	<!DOCTYPE html>
+    <html lang="en">
+    	<head>
+    		<meta charset="utf-8"/>
+    		<title>Thunder Share</title>
+            <link href="../assets/css/style.css" rel="stylesheet"/>
+    		<script src="https://unpkg.com/htmx.org@2.0.1" integrity="sha384-QWGpdj554B4ETpJJC9z+ZHJcA/i59TyjxEPXiiUgN2WmTyV5OEZWCD6gQhgkdpB/" crossorigin="anonymous"></script>
+    	</head>
+    	<body>
+    		<main>
+    	        @component.Header()
+    			{ children... }
+    		</main>
+    	</body>
+    </html>
+}

@@ -1,0 +1,17 @@
+package pages
+
+import "github.com/XxThunderBlastxX/neoshare/cmd/web/layout"
+
+templ HomePage() {
+	@layout.Base(){
+        <section class="px-8 pt-8">
+            <h1 class="pb-3">NeoShare </h1>
+            @homePagePara("This is a simple file sharing service. Upload your files and share them with others.")
+            @homePagePara("On NeoShare, you can simply upload files. You can share links to those files with anyone, and they never have to sign up for an account.")
+        </section>
+	}
+}
+
+templ homePagePara(text string) {
+	<p class="pb-3">{ text }</p>
+}
