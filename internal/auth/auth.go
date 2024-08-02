@@ -3,9 +3,11 @@ package auth
 import (
 	"context"
 	"errors"
-	"github.com/XxThunderBlastxX/neoshare/internal/config"
+
 	"github.com/coreos/go-oidc/v3/oidc"
 	"golang.org/x/oauth2"
+
+	"github.com/XxThunderBlastxX/neoshare/internal/config"
 )
 
 // Authenticator is used to authenticate our users.
