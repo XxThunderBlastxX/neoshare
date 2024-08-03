@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"github.com/XxThunderBlastxX/neoshare/internal/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
@@ -17,6 +16,7 @@ type s3Service struct {
 
 type S3Service interface {
 	UploadFile(key *string, object io.Reader) error
+	DownloadFile(key *string) ([]byte, error)
 }
 
 func New(c *config.S3Config) S3Service {
@@ -34,9 +34,13 @@ func New(c *config.S3Config) S3Service {
 }
 
 func (s *s3Service) UploadFile(key *string, object io.Reader) error {
-	uploader := manager.NewUploader(s.client)
+	uploader := manager.NewUploader(s.client, func(u *manager.Uploader) {
+		u.Concurrency = 5
+		u.S3 = s.client
+		u.PartSize = 20 * 1024 * 1024
+	})
 
-	opt, err := uploader.Upload(context.TODO(), &s3.PutObjectInput{
+	_, err := uploader.Upload(context.Background(), &s3.PutObjectInput{
 		Bucket: &s.config.Bucket,
 		Key:    key,
 		Body:   object,
@@ -45,7 +49,21 @@ func (s *s3Service) UploadFile(key *string, object io.Reader) error {
 		return err
 	}
 
-	fmt.Println(opt)
-
 	return nil
+}
+
+func (s *s3Service) DownloadFile(key *string) ([]byte, error) {
+	downloader := manager.NewDownloader(s.client)
+
+	buff := manager.NewWriteAtBuffer([]byte{})
+
+	_, err := downloader.Download(context.Background(), buff, &s3.GetObjectInput{
+		Bucket: &s.config.Bucket,
+		Key:    key,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return buff.Bytes(), nil
 }

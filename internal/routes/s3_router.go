@@ -9,4 +9,5 @@ func (r *Router) S3Router() {
 
 	// API
 	api.Post("/s3/upload", s3Handler.UploadHandler())
+	api.Get("/s3/:key", s3Handler.DownloadHandler())
 }

@@ -11,6 +11,7 @@ type s3Handler struct {
 
 type S3Handler interface {
 	UploadHandler() fiber.Handler
+	DownloadHandler() fiber.Handler
 }
 
 func NewS3Handler(s3Service service.S3Service) S3Handler {
@@ -37,7 +38,7 @@ func (s *s3Handler) UploadHandler() fiber.Handler {
 
 		defer file.Close()
 
-		key := "kuchbhi2"
+		key := "kuchbhi8"
 
 		err = s.s3Service.UploadFile(&key, file)
 		if err != nil {
@@ -50,4 +51,23 @@ func (s *s3Handler) UploadHandler() fiber.Handler {
 			"message": "File uploaded successfully",
 		})
 	}
+}
+
+func (s *s3Handler) DownloadHandler() fiber.Handler {
+	return func(ctx *fiber.Ctx) error {
+		key := ctx.Params("key")
+
+		file, err := s.s3Service.DownloadFile(&key)
+		if err != nil {
+			return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": err.Error(),
+			})
+		}
+
+		// TODO: Set the content type based on the file type
+		ctx.Set("Content-Type", "image/png")
+
+		return ctx.Status(fiber.StatusOK).Send(file)
+	}
+
 }
