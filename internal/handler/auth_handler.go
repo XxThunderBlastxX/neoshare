@@ -27,7 +27,7 @@ type AuthHandler interface {
 	LoginView() fiber.Handler
 }
 
-func New(sess *session.Session, auth *auth.Authenticator) AuthHandler {
+func NewAuthHandler(sess *session.Session, auth *auth.Authenticator) AuthHandler {
 	return &authHandler{
 		session: sess,
 		auth:    auth,

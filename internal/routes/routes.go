@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"github.com/XxThunderBlastxX/neoshare/internal/service"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
@@ -18,6 +19,7 @@ type Router struct {
 	authenticator *auth.Authenticator
 	sessionStore  *session.Session
 	middleware    *middleware.Middleware
+	s3service     service.S3Service
 }
 
 func New(app *server.Server, authenticator *auth.Authenticator, sessionStore *session.Session) *Router {
@@ -37,5 +39,6 @@ func New(app *server.Server, authenticator *auth.Authenticator, sessionStore *se
 		authenticator: authenticator,
 		sessionStore:  sessionStore,
 		middleware:    middleware.New(sessionStore, authenticator),
+		s3service:     service.New(&app.Config.S3Config),
 	}
 }

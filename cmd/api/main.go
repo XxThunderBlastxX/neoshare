@@ -19,7 +19,10 @@ func main() {
 
 	gob.Register(map[string]interface{}{})
 
-	routes.New(app, a, sess).AuthRouter()
+	r := routes.New(app, a, sess)
+
+	r.AuthRouter()
+	r.S3Router()
 
 	if err := app.Listen(":" + strconv.Itoa(app.Config.Port)); err != nil {
 		panic(err)
