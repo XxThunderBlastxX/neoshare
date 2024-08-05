@@ -11,12 +11,14 @@ import (
 
 	"github.com/XxThunderBlastxX/neoshare/cmd/web/page"
 	"github.com/XxThunderBlastxX/neoshare/internal/auth"
+	"github.com/XxThunderBlastxX/neoshare/internal/model"
 	"github.com/XxThunderBlastxX/neoshare/internal/session"
 )
 
 type authHandler struct {
-	session *session.Session
-	auth    *auth.Authenticator
+	session       *session.Session
+	auth          *auth.Authenticator
+	authCookieKey string
 }
 
 type AuthHandler interface {
@@ -29,8 +31,9 @@ type AuthHandler interface {
 
 func NewAuthHandler(sess *session.Session, auth *auth.Authenticator) AuthHandler {
 	return &authHandler{
-		session: sess,
-		auth:    auth,
+		session:       sess,
+		auth:          auth,
+		authCookieKey: "auth_token",
 	}
 }
 
@@ -46,13 +49,19 @@ func (a *authHandler) LoginHandler() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		state, err := generateRandomState()
 		if err != nil {
-			return ctx.Status(fiber.StatusInternalServerError).SendString(err.Error())
+			return ctx.Status(fiber.StatusInternalServerError).JSON(model.WebResponse[*model.ErrorResponse]{
+				Error:   err.Error(),
+				Success: false,
+			})
 		}
 
 		sess, _ := a.session.Get(ctx)
 		sess.Set("state", state)
 		if err := sess.Save(); err != nil {
-			return ctx.Status(fiber.StatusInternalServerError).SendString(err.Error())
+			return ctx.Status(fiber.StatusInternalServerError).JSON(model.WebResponse[*model.ErrorResponse]{
+				Error:   err.Error(),
+				Success: false,
+			})
 		}
 
 		opt := oauth2.SetAuthURLParam("audience", "https://thunder.jp.auth0.com/api/v2/")
@@ -64,35 +73,46 @@ func (a *authHandler) CallbackHandler() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		sess, _ := a.session.Get(ctx)
 		if ctx.Query("state") != sess.Get("state") {
-			return ctx.Status(fiber.StatusUnauthorized).SendString("Invalid state.")
+			return ctx.Status(fiber.StatusUnauthorized).JSON(model.WebResponse[*model.ErrorResponse]{
+				Error:   "Invalid state",
+				Success: false,
+			})
 		}
 
 		code := ctx.Query("code")
 		opt := oauth2.SetAuthURLParam("audience", "https://thunder.jp.auth0.com/api/v2/")
 		token, err := a.auth.Exchange(ctx.Context(), code, opt)
 		if err != nil {
-			return ctx.Status(fiber.StatusInternalServerError).SendString(err.Error())
+			return ctx.Status(fiber.StatusInternalServerError).JSON(model.WebResponse[*model.ErrorResponse]{
+				Error:   "Code exchange failed" + err.Error(),
+				Success: false,
+			})
 		}
 
 		_, err = a.auth.VerifyIDToken(ctx.Context(), token)
 		if err != nil {
-			return ctx.Status(fiber.StatusInternalServerError).SendString(err.Error())
+			return ctx.Status(fiber.StatusInternalServerError).JSON(model.WebResponse[*model.ErrorResponse]{
+				Error:   "ID token not verified" + err.Error(),
+				Success: false,
+			})
 		}
 
 		c := new(fiber.Cookie)
-		c.Name = "auth_token"
+		c.Name = a.authCookieKey
 		c.Value = token.AccessToken
 		c.Expires = token.Expiry
+		c.Secure = true
 
 		ctx.Cookie(c)
 
-		return ctx.Redirect("/")
+		return ctx.Redirect("/dashboard")
 	}
 }
 
 func (a *authHandler) LogoutHandler() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		return nil
+		ctx.ClearCookie(a.authCookieKey)
+		return ctx.Redirect(a.auth.RevokeToken())
 	}
 }
 

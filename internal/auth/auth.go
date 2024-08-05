@@ -1,8 +1,11 @@
 package auth
 
 import (
+	"bytes"
 	"context"
 	"errors"
+	"net/url"
+	"strings"
 
 	"github.com/coreos/go-oidc/v3/oidc"
 	"golang.org/x/oauth2"
@@ -52,4 +55,20 @@ func (a *Authenticator) VerifyIDToken(ctx context.Context, token *oauth2.Token) 
 	}
 
 	return a.Verifier(oidcConfig).Verify(ctx, rawIDToken)
+}
+
+// RevokeToken TODO: Fix this revoke token function.
+func (a *Authenticator) RevokeToken() string {
+	var buff bytes.Buffer
+
+	logoutURL := strings.Replace(a.Provider.Endpoint().AuthURL+"/", "/authorize", "/v2/logout", 1)
+	buff.WriteString(logoutURL)
+
+	params := url.Values{
+		"client_id": {a.ClientID},
+		"returnTo":  {a.RedirectURL},
+	}
+
+	buff.WriteString(params.Encode())
+	return buff.String()
 }

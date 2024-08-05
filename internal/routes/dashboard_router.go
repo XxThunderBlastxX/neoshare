@@ -14,4 +14,5 @@ func (r *Router) DashboardRouter() {
 
 	// View Routes
 	view.Get("/dashboard", h.DashboardView())
+	view.Get("/:key", h.DownloadHandler())
 }
