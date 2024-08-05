@@ -30,10 +30,10 @@ func (m *Middleware) VerifyToken() fiber.Handler {
 			Key:    publicKey,
 		},
 		SuccessHandler: func(ctx *fiber.Ctx) error {
-			return ctx.SendString("Hello, World!")
+			return ctx.Next()
 		},
 		ErrorHandler: func(ctx *fiber.Ctx, err error) error {
-			return ctx.SendString(err.Error())
+			return ctx.Status(fiber.StatusUnauthorized).Redirect("/login")
 		},
 		TokenLookup: "cookie:auth_token",
 	})

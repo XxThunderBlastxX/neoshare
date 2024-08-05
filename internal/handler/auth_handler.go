@@ -39,6 +39,11 @@ func NewAuthHandler(sess *session.Session, auth *auth.Authenticator) AuthHandler
 
 func (a *authHandler) LoginView() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
+		authCookie := ctx.Cookies(a.authCookieKey)
+		if authCookie != "" {
+			return ctx.Redirect("/dashboard")
+		}
+
 		render := adaptor.HTTPHandler(templ.Handler(page.AuthPage()))
 
 		return render(ctx)

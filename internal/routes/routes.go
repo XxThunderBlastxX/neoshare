@@ -3,7 +3,6 @@ package routes
 import (
 	"net/http"
 
-	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
 
 	"github.com/XxThunderBlastxX/neoshare/cmd/web"
@@ -23,17 +22,6 @@ type Router struct {
 }
 
 func New(app *server.Server) *Router {
-	app.Use("/assets", filesystem.New(filesystem.Config{
-		Root:       http.FS(web.Files),
-		PathPrefix: "assets",
-		Browse:     false,
-	}))
-
-	// TODO: Redirect to login page or dashboard.templ page
-	app.Get("/", func(ctx *fiber.Ctx) error {
-		return ctx.Redirect("/dashboard")
-	})
-
 	return &Router{
 		app:           app,
 		authenticator: app.Authenticator,
@@ -44,6 +32,15 @@ func New(app *server.Server) *Router {
 }
 
 func (r *Router) RegisterRoutes() {
+	r.app.Use("/assets", filesystem.New(filesystem.Config{
+		Root:       http.FS(web.Files),
+		PathPrefix: "assets",
+		Browse:     false,
+	}))
+
 	r.AuthRouter()
+
+	r.app.Use(r.middleware.VerifyToken())
+
 	r.DashboardRouter()
 }
