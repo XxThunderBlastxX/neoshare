@@ -1,6 +1,9 @@
 package handler
 
 import (
+	"strconv"
+	"time"
+
 	"github.com/a-h/templ"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/adaptor"
@@ -8,6 +11,7 @@ import (
 	"github.com/XxThunderBlastxX/neoshare/cmd/web/page"
 	"github.com/XxThunderBlastxX/neoshare/internal/model"
 	"github.com/XxThunderBlastxX/neoshare/internal/service"
+	"github.com/XxThunderBlastxX/neoshare/internal/utils"
 )
 
 type dashboardHandler struct {
@@ -54,8 +58,7 @@ func (d *dashboardHandler) UploadHandler() fiber.Handler {
 		}
 		defer file.Close()
 
-		// TODO: Generate a random key
-		key := "kuchbhi8"
+		key := utils.GenerateUID(strconv.FormatInt(time.Now().UnixNano(), 10))
 
 		err = d.s3Service.UploadFile(&key, file)
 		if err != nil {
