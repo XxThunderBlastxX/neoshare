@@ -60,7 +60,9 @@ func (d *dashboardHandler) UploadHandler() fiber.Handler {
 
 		key := utils.GenerateUID(strconv.FormatInt(time.Now().UnixNano(), 10))
 
-		err = d.s3Service.UploadFile(&key, file)
+		contentType := fileHeader.Header.Get("Content-Type")
+
+		err = d.s3Service.UploadFile(&key, contentType, file)
 		if err != nil {
 			return ctx.Status(fiber.StatusInternalServerError).JSON(model.WebResponse[*model.ErrorResponse]{
 				Error:   err.Error(),
