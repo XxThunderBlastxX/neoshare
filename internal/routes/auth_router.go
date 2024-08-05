@@ -1,8 +1,6 @@
 package routes
 
 import (
-	"github.com/gofiber/fiber/v2"
-
 	"github.com/XxThunderBlastxX/neoshare/internal/handler"
 )
 
@@ -19,7 +17,4 @@ func (r *Router) AuthRouter() {
 
 	// View Routes
 	view.Get("/login", authHandler.LoginView())
-	view.Get("/kuchbhi", r.middleware.VerifyToken(), func(ctx *fiber.Ctx) error {
-		return ctx.SendString("Hello, World!")
-	})
 }

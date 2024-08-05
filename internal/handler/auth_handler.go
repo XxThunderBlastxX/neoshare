@@ -36,7 +36,7 @@ func NewAuthHandler(sess *session.Session, auth *auth.Authenticator) AuthHandler
 
 func (a *authHandler) LoginView() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		render := adaptor.HTTPHandler(templ.Handler(page.HomePage()))
+		render := adaptor.HTTPHandler(templ.Handler(page.AuthPage()))
 
 		return render(ctx)
 	}

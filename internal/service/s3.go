@@ -2,11 +2,13 @@ package service
 
 import (
 	"context"
-	"github.com/XxThunderBlastxX/neoshare/internal/config"
+	"io"
+
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"io"
+
+	"github.com/XxThunderBlastxX/neoshare/internal/config"
 )
 
 type s3Service struct {

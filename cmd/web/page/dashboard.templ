@@ -1,0 +1,15 @@
+package page
+
+import "github.com/XxThunderBlastxX/neoshare/cmd/web/layout"
+
+templ DashboardPage() {
+    @layout.Base(true){
+        <section class="px-12">
+            <h1 class="text-3xl">Upload</h1>
+            <form action="/api/upload" method="post" enctype="multipart/form-data">
+                <input type="file" name="file" />
+                <button type="submit">Upload</button>
+            </form>
+        </section>
+    }
+}
