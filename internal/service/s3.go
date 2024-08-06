@@ -11,6 +11,7 @@ import (
 
 	"github.com/XxThunderBlastxX/neoshare/internal/config"
 	"github.com/XxThunderBlastxX/neoshare/internal/model"
+	"github.com/XxThunderBlastxX/neoshare/internal/utils"
 )
 
 type s3Service struct {
@@ -19,7 +20,7 @@ type s3Service struct {
 }
 
 type S3Service interface {
-	UploadFile(key string, contentType string, object io.Reader) error
+	UploadFile(key string, contentType string, fileName string, object io.Reader) error
 	DownloadFile(key string) ([]byte, error)
 	GetFiles() ([]model.File, error)
 }
@@ -38,18 +39,24 @@ func New(c *config.S3Config) S3Service {
 	}
 }
 
-func (s *s3Service) UploadFile(key string, contentType string, object io.Reader) error {
+func (s *s3Service) UploadFile(key string, contentType string, fileName string, object io.Reader) error {
 	uploader := manager.NewUploader(s.client, func(u *manager.Uploader) {
 		u.Concurrency = 5
 		u.S3 = s.client
 		u.PartSize = 20 * 1024 * 1024
 	})
 
+	// Defining metadata for the file.
+	metaData := map[string]string{
+		"filename": utils.RemoveNonAsciiValue(fileName),
+	}
+
 	_, err := uploader.Upload(context.Background(), &s3.PutObjectInput{
 		Bucket:      aws.String(s.config.Bucket),
 		Key:         aws.String(key),
 		Body:        object,
 		ContentType: aws.String(contentType),
+		Metadata:    metaData,
 	})
 	if err != nil {
 		return err
