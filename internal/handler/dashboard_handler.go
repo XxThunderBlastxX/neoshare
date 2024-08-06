@@ -24,6 +24,7 @@ type DashboardHandler interface {
 	DownloadHandler() fiber.Handler
 
 	DashboardView() fiber.Handler
+	FilesView() fiber.Handler
 }
 
 func NewDashboardHandler(s3Service service.S3Service) DashboardHandler {
@@ -63,7 +64,7 @@ func (d *dashboardHandler) UploadHandler() fiber.Handler {
 
 		contentType := fileHeader.Header.Get("Content-Type")
 
-		err = d.s3Service.UploadFile(&key, contentType, file)
+		err = d.s3Service.UploadFile(key, contentType, file)
 		if err != nil {
 			return ctx.Status(fiber.StatusInternalServerError).JSON(model.WebResponse[*model.ErrorResponse]{
 				Error:   err.Error(),
@@ -81,7 +82,7 @@ func (d *dashboardHandler) DownloadHandler() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		key := ctx.Params("key")
 
-		file, err := d.s3Service.DownloadFile(&key)
+		file, err := d.s3Service.DownloadFile(key)
 		if err != nil {
 			return ctx.Status(fiber.StatusInternalServerError).JSON(model.WebResponse[*model.ErrorResponse]{
 				Error:   err.Error(),
@@ -93,5 +94,20 @@ func (d *dashboardHandler) DownloadHandler() fiber.Handler {
 		ctx.Set("Content-Type", "image/png")
 
 		return ctx.Status(fiber.StatusOK).Send(file)
+	}
+}
+
+func (d *dashboardHandler) FilesView() fiber.Handler {
+	return func(ctx *fiber.Ctx) error {
+		files, err := d.s3Service.GetFiles()
+		if err != nil {
+			return ctx.Status(fiber.StatusInternalServerError).JSON(model.WebResponse[*model.ErrorResponse]{
+				Error:   err.Error(),
+				Success: false,
+			})
+		}
+		render := adaptor.HTTPHandler(templ.Handler(page.FilesPage(files)))
+
+		return render(ctx)
 	}
 }

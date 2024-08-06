@@ -1,0 +1,38 @@
+package page 
+
+import (
+	"github.com/XxThunderBlastxX/neoshare/cmd/web/component"
+	"github.com/XxThunderBlastxX/neoshare/cmd/web/layout"
+	"github.com/XxThunderBlastxX/neoshare/internal/model"
+)
+
+templ FilesPage(files []model.File) {
+	@layout.Base(true) {
+		<section>
+			if len(files) == 0 {
+				<div class="px-12 flex justify-center">
+					<h1 class="text-4xl">No files found</h1>
+				</div>
+			} else {
+				<div class="overflow-x-auto px-12">
+					<table class="table">
+						<thead>
+							<tr>
+								<th></th>
+								<th>Name</th>
+								<th>Key</th>
+								<th>Size</th>
+								<th>Last Modified</th>
+							</tr>
+						</thead>
+						<tbody>
+							for idx , file := range files {
+								@component.TableRow(file, idx+1)
+							}
+						</tbody>
+					</table>
+				</div>
+			}
+		</section>
+	}
+}

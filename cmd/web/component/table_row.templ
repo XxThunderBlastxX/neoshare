@@ -1,0 +1,17 @@
+package component
+
+import (
+	"github.com/XxThunderBlastxX/neoshare/internal/model"
+	"strconv"
+	"time"
+)
+
+templ TableRow(file model.File, idx int) {
+	<tr>
+		<th>{ strconv.Itoa(idx) }</th>
+		<td>{ file.Name }</td>
+		<td>{ file.Key }</td>
+		<td>{ strconv.FormatInt(file.Size, 10) }</td>
+		<td>{ file.LastModified.Format(time.RFC822) }</td>
+	</tr>
+}

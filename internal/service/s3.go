@@ -4,11 +4,13 @@ import (
 	"context"
 	"io"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 
 	"github.com/XxThunderBlastxX/neoshare/internal/config"
+	"github.com/XxThunderBlastxX/neoshare/internal/model"
 )
 
 type s3Service struct {
@@ -17,8 +19,9 @@ type s3Service struct {
 }
 
 type S3Service interface {
-	UploadFile(key *string, contentType string, object io.Reader) error
-	DownloadFile(key *string) ([]byte, error)
+	UploadFile(key string, contentType string, object io.Reader) error
+	DownloadFile(key string) ([]byte, error)
+	GetFiles() ([]model.File, error)
 }
 
 func New(c *config.S3Config) S3Service {
@@ -35,7 +38,7 @@ func New(c *config.S3Config) S3Service {
 	}
 }
 
-func (s *s3Service) UploadFile(key *string, contentType string, object io.Reader) error {
+func (s *s3Service) UploadFile(key string, contentType string, object io.Reader) error {
 	uploader := manager.NewUploader(s.client, func(u *manager.Uploader) {
 		u.Concurrency = 5
 		u.S3 = s.client
@@ -43,10 +46,10 @@ func (s *s3Service) UploadFile(key *string, contentType string, object io.Reader
 	})
 
 	_, err := uploader.Upload(context.Background(), &s3.PutObjectInput{
-		Bucket:      &s.config.Bucket,
-		Key:         key,
+		Bucket:      aws.String(s.config.Bucket),
+		Key:         aws.String(key),
 		Body:        object,
-		ContentType: &contentType,
+		ContentType: aws.String(contentType),
 	})
 	if err != nil {
 		return err
@@ -55,18 +58,39 @@ func (s *s3Service) UploadFile(key *string, contentType string, object io.Reader
 	return nil
 }
 
-func (s *s3Service) DownloadFile(key *string) ([]byte, error) {
+func (s *s3Service) DownloadFile(key string) ([]byte, error) {
 	downloader := manager.NewDownloader(s.client)
 
 	buff := manager.NewWriteAtBuffer([]byte{})
 
 	_, err := downloader.Download(context.Background(), buff, &s3.GetObjectInput{
-		Bucket: &s.config.Bucket,
-		Key:    key,
+		Bucket: aws.String(s.config.Bucket),
+		Key:    aws.String(key),
 	})
 	if err != nil {
 		return nil, err
 	}
 
 	return buff.Bytes(), nil
+}
+
+func (s *s3Service) GetFiles() ([]model.File, error) {
+	var files []model.File
+
+	objects, err := s.client.ListObjectsV2(context.Background(), &s3.ListObjectsV2Input{
+		Bucket: &s.config.Bucket,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	for _, obj := range objects.Contents {
+		files = append(files, model.File{
+			Key:          *obj.Key,
+			Size:         *obj.Size,
+			LastModified: *obj.LastModified,
+		})
+	}
+
+	return files, nil
 }

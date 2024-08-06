@@ -1,26 +1,26 @@
 package component
 
 templ Header(isAuthenticated bool) {
-	 <header class="flex justify-between px-4 py-2">
-        if isAuthenticated {
-            <div class="navbar bg-base-100">
-              <div class="navbar-start">
-                <a class="btn btn-ghost text-xl">neoShare</a>
-              </div>
-              <div class="navbar-center lg:flex">
-                <ul class="menu menu-horizontal px-1 gap-2">
-                  <li class="btn btn-accent"><a>Upload</a></li>
-                  <li class="btn"><a>Files</a></li>
-                </ul>
-              </div>
-              <div class="navbar-end">
-                <a class="btn" href="/api/logout">Logout</a>
-              </div>
-            </div>
-        }else{
-            <a href="/api/login" class="btn" >
-                Login
-            </a>
-        }
-     </header>
+	<header class="flex justify-between px-4 py-2">
+		if isAuthenticated {
+			<div class="navbar bg-base-100">
+				<div class="navbar-start">
+					<a class="btn btn-ghost text-xl">neoShare</a>
+				</div>
+				<div class="navbar-center lg:flex">
+					<ul class="menu menu-horizontal px-1 gap-2">
+						<li class="btn btn-accent"><a href="/dashboard">Upload</a></li>
+						<li class="btn"><a href="/files">Files</a></li>
+					</ul>
+				</div>
+				<div class="navbar-end">
+					<a class="btn" href="/api/logout">Logout</a>
+				</div>
+			</div>
+		} else {
+			<a href="/api/login" class="btn">
+				Login
+			</a>
+		}
+	</header>
 }
