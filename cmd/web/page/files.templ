@@ -10,8 +10,8 @@ templ FilesPage(files []model.File) {
 	@layout.Base(true) {
 		<section>
 			if len(files) == 0 {
-				<div class="px-12 flex justify-center">
-					<h1 class="text-4xl">No files found</h1>
+				<div class="px-12 flex justify-center items-center h-screen">
+					<h1 class="text-3xl">No files found</h1>
 				</div>
 			} else {
 				<div class="overflow-x-auto px-12">

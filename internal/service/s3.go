@@ -92,7 +92,9 @@ func (s *s3Service) GetFiles() ([]model.File, error) {
 	}
 
 	for _, obj := range objects.Contents {
+		filename, _, _ := s.GetFileNameAndType(*obj.Key)
 		files = append(files, model.File{
+			Name:         filename,
 			Key:          *obj.Key,
 			Size:         *obj.Size,
 			LastModified: *obj.LastModified,
@@ -100,4 +102,16 @@ func (s *s3Service) GetFiles() ([]model.File, error) {
 	}
 
 	return files, nil
+}
+
+func (s *s3Service) GetFileNameAndType(key string) (string, string, error) {
+	metaData, err := s.client.HeadObject(context.Background(), &s3.HeadObjectInput{
+		Bucket: aws.String(s.config.Bucket),
+		Key:    aws.String(key),
+	})
+	if err != nil {
+		return "", "", err
+	}
+
+	return metaData.Metadata["filename"], *metaData.ContentType, nil
 }
