@@ -9,7 +9,7 @@ BINARY_NAME := neoshare
 .PHONY: build
 build:
 	@echo "Building binary..."
-	@templ generate
+	@TEMPL_EXPERIMENT=rawgo templ generate
 	@pnpx tailwindcss -i cmd/web/assets/css/input.css -o cmd/web/assets/css/style.css
 	@go build -o bin/$(BINARY_NAME) $(MAIN_PACKAGE)
 

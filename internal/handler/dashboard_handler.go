@@ -8,6 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/adaptor"
 
+	"github.com/XxThunderBlastxX/neoshare/cmd/web/component"
 	"github.com/XxThunderBlastxX/neoshare/cmd/web/page"
 	"github.com/XxThunderBlastxX/neoshare/internal/model"
 	"github.com/XxThunderBlastxX/neoshare/internal/service"
@@ -70,9 +71,9 @@ func (d *dashboardHandler) UploadHandler() fiber.Handler {
 			})
 		}
 
-		return ctx.Status(fiber.StatusOK).JSON(model.WebResponse[*model.SuccessResponse]{
-			Success: true,
-		})
+		render := adaptor.HTTPHandler(templ.Handler(component.ShortLinkView(ctx.BaseURL() + "/" + key)))
+
+		return render(ctx)
 	}
 }
 

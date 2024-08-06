@@ -28,7 +28,8 @@ func New() *Server {
 
 	server := &Server{
 		App: fiber.New(fiber.Config{
-			AppName: "NeoShare",
+			AppName:   "NeoShare",
+			BodyLimit: 10 * 1024 * 1024 * 1024,
 		}),
 		Config:        c,
 		Session:       session.New(),
