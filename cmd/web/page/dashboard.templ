@@ -3,15 +3,16 @@ package page
 import (
 	"github.com/XxThunderBlastxX/neoshare/cmd/web/component"
 	"github.com/XxThunderBlastxX/neoshare/cmd/web/layout"
+	"github.com/XxThunderBlastxX/neoshare/internal/model"
 )
 
-templ DashboardPage(isError bool, errorCode int, msg string) {
-	@layout.Base(true, isError, errorCode, msg) {
-		@UploadSection(isError, errorCode, msg)
+templ DashboardPage(message ...model.WebResponse) {
+	@layout.Base(true, message...) {
+		@UploadSection(message...)
 	}
 }
 
-templ UploadSection(isError bool, errorCode int, msg string) {
+templ UploadSection(message ...model.WebResponse) {
 	<section id="upload-view" class="px-12">
 		<div>
 			<h1 class="text-3xl">Upload</h1>
@@ -23,8 +24,14 @@ templ UploadSection(isError bool, errorCode int, msg string) {
 				</button>
 			</form>
 		</div>
-		if isError {
-			@component.ErrorToast(msg, errorCode)
+		for _, msg := range message {
+			switch msg.Success {
+				case true:
+					@component.SuccessToast(msg.Message)
+				case false:
+					@component.ErrorToast(msg.Error, msg.StatusCode)
+				default:
+			}
 		}
 	</section>
 }

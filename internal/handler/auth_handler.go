@@ -7,6 +7,7 @@ import (
 	"github.com/a-h/templ"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/adaptor"
+	"github.com/sujit-baniya/flash"
 	"golang.org/x/oauth2"
 
 	"github.com/XxThunderBlastxX/neoshare/cmd/web/page"
@@ -39,12 +40,20 @@ func NewAuthHandler(sess *session.Session, auth *auth.Authenticator) AuthHandler
 
 func (a *authHandler) LoginView() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
+		res := flash.Get(ctx)
+		if len(res) != 0 {
+			var resData model.WebResponse
+			resData.ConvertToStruct(res)
+			render := adaptor.HTTPHandler(templ.Handler(page.AuthPage(resData)))
+			return render(ctx)
+		}
+
 		authCookie := ctx.Cookies(a.authCookieKey)
 		if authCookie != "" {
 			return ctx.Redirect("/dashboard")
 		}
 
-		render := adaptor.HTTPHandler(templ.Handler(page.AuthPage(false, 200, "")))
+		render := adaptor.HTTPHandler(templ.Handler(page.AuthPage()))
 
 		return render(ctx)
 	}
@@ -54,19 +63,23 @@ func (a *authHandler) LoginHandler() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		state, err := generateRandomState()
 		if err != nil {
-			return ctx.Status(fiber.StatusInternalServerError).JSON(model.WebResponse[*model.ErrorResponse]{
-				Error:   err.Error(),
-				Success: false,
-			})
+			errRes := model.WebResponse{
+				Error:      err.Error(),
+				StatusCode: fiber.StatusInternalServerError,
+				Success:    false,
+			}
+			return flash.WithError(ctx, errRes.ConvertToMap()).Redirect("/login")
 		}
 
 		sess, _ := a.session.Get(ctx)
 		sess.Set("state", state)
 		if err := sess.Save(); err != nil {
-			return ctx.Status(fiber.StatusInternalServerError).JSON(model.WebResponse[*model.ErrorResponse]{
-				Error:   err.Error(),
-				Success: false,
-			})
+			errRes := model.WebResponse{
+				Error:      err.Error(),
+				StatusCode: fiber.StatusInternalServerError,
+				Success:    false,
+			}
+			return flash.WithError(ctx, errRes.ConvertToMap()).Redirect("/login")
 		}
 
 		opt := oauth2.SetAuthURLParam("audience", "https://thunder.jp.auth0.com/api/v2/")
@@ -78,28 +91,34 @@ func (a *authHandler) CallbackHandler() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		sess, _ := a.session.Get(ctx)
 		if ctx.Query("state") != sess.Get("state") {
-			return ctx.Status(fiber.StatusUnauthorized).JSON(model.WebResponse[*model.ErrorResponse]{
-				Error:   "Invalid state",
-				Success: false,
-			})
+			errRes := model.WebResponse{
+				Error:      "Application state does not match",
+				StatusCode: fiber.StatusInternalServerError,
+				Success:    false,
+			}
+			return flash.WithError(ctx, errRes.ConvertToMap()).Redirect("/login")
 		}
 
 		code := ctx.Query("code")
 		opt := oauth2.SetAuthURLParam("audience", "https://thunder.jp.auth0.com/api/v2/")
 		token, err := a.auth.Exchange(ctx.Context(), code, opt)
 		if err != nil {
-			return ctx.Status(fiber.StatusInternalServerError).JSON(model.WebResponse[*model.ErrorResponse]{
-				Error:   "Code exchange failed" + err.Error(),
-				Success: false,
-			})
+			errRes := model.WebResponse{
+				Error:      err.Error(),
+				StatusCode: fiber.StatusInternalServerError,
+				Success:    false,
+			}
+			return flash.WithError(ctx, errRes.ConvertToMap()).Redirect("/login")
 		}
 
 		_, err = a.auth.VerifyIDToken(ctx.Context(), token)
 		if err != nil {
-			return ctx.Status(fiber.StatusInternalServerError).JSON(model.WebResponse[*model.ErrorResponse]{
-				Error:   "ID token not verified" + err.Error(),
-				Success: false,
-			})
+			errRes := model.WebResponse{
+				Error:      err.Error(),
+				StatusCode: fiber.StatusInternalServerError,
+				Success:    false,
+			}
+			return flash.WithError(ctx, errRes.ConvertToMap()).Redirect("/login")
 		}
 
 		c := new(fiber.Cookie)

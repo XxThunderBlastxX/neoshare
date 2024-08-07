@@ -1,8 +1,11 @@
 package layout
 
-import "github.com/XxThunderBlastxX/neoshare/cmd/web/component"
+import (
+	"github.com/XxThunderBlastxX/neoshare/cmd/web/component"
+	"github.com/XxThunderBlastxX/neoshare/internal/model"
+)
 
-templ Base(isAuthenticated bool, isError bool, errorCode int, message ...string) {
+templ Base(isAuthenticated bool, message ...model.WebResponse) {
 	<!DOCTYPE html>
 	<html lang="en" data-theme="neosharetheme">
 		<head>
@@ -18,13 +21,13 @@ templ Base(isAuthenticated bool, isError bool, errorCode int, message ...string)
 			</header>
 			<main>
 				{ children... }
-				if isError {
-					for _, msg := range message {
-						@component.ErrorToast(msg, errorCode)
-					}
-				} else {
-					for _, msg := range message {
-						@component.SuccessToast(msg)
+				for _, msg := range message {
+					switch msg.Success {
+						case true:
+							@component.SuccessToast(msg.Message)
+						case false:
+							@component.ErrorToast(msg.Error, msg.StatusCode)
+						default:
 					}
 				}
 			</main>

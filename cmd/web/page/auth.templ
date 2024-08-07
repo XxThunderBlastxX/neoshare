@@ -1,9 +1,12 @@
 package page
 
-import "github.com/XxThunderBlastxX/neoshare/cmd/web/layout"
+import (
+	"github.com/XxThunderBlastxX/neoshare/cmd/web/layout"
+	"github.com/XxThunderBlastxX/neoshare/internal/model"
+)
 
-templ AuthPage(isError bool, errorCode int, message string) {
-	@layout.Base(false, isError, errorCode, message) {
+templ AuthPage(message ...model.WebResponse) {
+	@layout.Base(false, message...) {
 		<section class="px-8 pt-8">
 			<h1 class="pb-3">NeoShare </h1>
 			@homePagePara("This is a simple file sharing service. Upload your files and share them with others.")

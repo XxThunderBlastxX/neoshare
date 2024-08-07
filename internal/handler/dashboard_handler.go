@@ -35,7 +35,7 @@ func NewDashboardHandler(s3Service service.S3Service) DashboardHandler {
 
 func (d *dashboardHandler) DashboardView() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		render := adaptor.HTTPHandler(templ.Handler(page.DashboardPage(false, 200, "")))
+		render := adaptor.HTTPHandler(templ.Handler(page.DashboardPage()))
 
 		return render(ctx)
 	}
@@ -43,17 +43,25 @@ func (d *dashboardHandler) DashboardView() fiber.Handler {
 
 func (d *dashboardHandler) UploadHandler() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		render := adaptor.HTTPHandler(templ.Handler(page.DashboardPage(false, 200, "")))
+		render := adaptor.HTTPHandler(templ.Handler(page.DashboardPage()))
 
 		fileHeader, err := ctx.FormFile("file")
 		if err != nil {
-			render = adaptor.HTTPHandler(templ.Handler(page.UploadSection(true, fiber.StatusNotFound, "No file uploaded")))
+			render = adaptor.HTTPHandler(templ.Handler(page.UploadSection(model.WebResponse{
+				Success:    false,
+				StatusCode: fiber.StatusNotFound,
+				Error:      "No file selected to upload",
+			})))
 			return render(ctx)
 		}
 
 		file, err := fileHeader.Open()
 		if err != nil {
-			render = adaptor.HTTPHandler(templ.Handler(page.UploadSection(true, 404, err.Error())))
+			render = adaptor.HTTPHandler(templ.Handler(page.UploadSection(model.WebResponse{
+				Error:      "Error occurred while opening the file",
+				StatusCode: fiber.StatusInternalServerError,
+				Success:    false,
+			})))
 			return render(ctx)
 		}
 		defer file.Close()
@@ -64,7 +72,11 @@ func (d *dashboardHandler) UploadHandler() fiber.Handler {
 
 		err = d.s3Service.UploadFile(key, contentType, fileHeader.Filename, file)
 		if err != nil {
-			render = adaptor.HTTPHandler(templ.Handler(page.UploadSection(true, fiber.StatusInternalServerError, err.Error())))
+			render = adaptor.HTTPHandler(templ.Handler(page.UploadSection(model.WebResponse{
+				Error:      "Error occurred while uploading the file",
+				StatusCode: fiber.StatusInternalServerError,
+				Success:    false,
+			})))
 			return render(ctx)
 		}
 
@@ -80,9 +92,10 @@ func (d *dashboardHandler) DownloadHandler() fiber.Handler {
 
 		file, err := d.s3Service.DownloadFile(key)
 		if err != nil {
-			return ctx.Status(fiber.StatusInternalServerError).JSON(model.WebResponse[*model.ErrorResponse]{
-				Error:   err.Error(),
-				Success: false,
+			return ctx.Status(fiber.StatusInternalServerError).JSON(model.WebResponse{
+				Error:      err.Error(),
+				StatusCode: fiber.StatusInternalServerError,
+				Success:    false,
 			})
 		}
 
@@ -97,12 +110,14 @@ func (d *dashboardHandler) FilesView() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		files, err := d.s3Service.GetFiles()
 		if err != nil {
-			return ctx.Status(fiber.StatusInternalServerError).JSON(model.WebResponse[*model.ErrorResponse]{
-				Error:   err.Error(),
-				Success: false,
+			// TODO: Implement better error handling
+			return ctx.Status(fiber.StatusInternalServerError).JSON(model.WebResponse{
+				Error:      err.Error(),
+				StatusCode: fiber.StatusInternalServerError,
+				Success:    false,
 			})
 		}
-		render := adaptor.HTTPHandler(templ.Handler(page.FilesPage(files, false, 200, "")))
+		render := adaptor.HTTPHandler(templ.Handler(page.FilesPage(files)))
 
 		return render(ctx)
 	}

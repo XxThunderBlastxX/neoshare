@@ -6,8 +6,8 @@ import (
 	"github.com/XxThunderBlastxX/neoshare/internal/model"
 )
 
-templ FilesPage(files []model.File, isError bool, errorCode int, msg string) {
-	@layout.Base(true, isError, errorCode, msg) {
+templ FilesPage(files []model.File, message ...model.WebResponse) {
+	@layout.Base(true, message...) {
 		<section>
 			if len(files) == 0 {
 				<div class="px-12 flex justify-center items-center h-screen">
