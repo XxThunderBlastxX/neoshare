@@ -1,20 +1,30 @@
 package page
 
-import "github.com/XxThunderBlastxX/neoshare/cmd/web/layout"
+import (
+	"github.com/XxThunderBlastxX/neoshare/cmd/web/component"
+	"github.com/XxThunderBlastxX/neoshare/cmd/web/layout"
+)
 
-templ DashboardPage() {
-	@layout.Base(true) {
-		<section class="px-12">
-			<div id="upload-view">
-				<h1 class="text-3xl">Upload</h1>
-				<form class="mt-12" hx-post="/api/upload" method="post" hx-encoding="multipart/form-data" hx-swap="outerHTML" hx-target="#upload-view" hx-indicator="#indicator">
-					<input type="file" name="file"/>
-					<button class="btn">
-						Upload
-						<span id="indicator" class="pl-3 loading loading-spinner loading-md htmx-indicator"></span>
-					</button>
-				</form>
-			</div>
-		</section>
+templ DashboardPage(isError bool, errorCode int, msg string) {
+	@layout.Base(true, isError, errorCode, msg) {
+		@UploadSection(isError, errorCode, msg)
 	}
+}
+
+templ UploadSection(isError bool, errorCode int, msg string) {
+	<section id="upload-view" class="px-12">
+		<div>
+			<h1 class="text-3xl">Upload</h1>
+			<form class="mt-12" hx-post="/api/upload" method="post" hx-encoding="multipart/form-data" hx-swap="outerHTML" hx-target="#upload-view" hx-indicator="#indicator">
+				<input type="file" name="file"/>
+				<button class="btn">
+					Upload
+					<span id="indicator" class="pl-3 loading loading-spinner loading-md htmx-indicator"></span>
+				</button>
+			</form>
+		</div>
+		if isError {
+			@component.ErrorToast(msg, errorCode)
+		}
+	</section>
 }

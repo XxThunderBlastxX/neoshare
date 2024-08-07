@@ -44,7 +44,7 @@ func (a *authHandler) LoginView() fiber.Handler {
 			return ctx.Redirect("/dashboard")
 		}
 
-		render := adaptor.HTTPHandler(templ.Handler(page.AuthPage()))
+		render := adaptor.HTTPHandler(templ.Handler(page.AuthPage(false, 200, "")))
 
 		return render(ctx)
 	}

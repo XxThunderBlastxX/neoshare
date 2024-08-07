@@ -2,21 +2,32 @@ package layout
 
 import "github.com/XxThunderBlastxX/neoshare/cmd/web/component"
 
-templ Base(isAuthenticated bool) {
+templ Base(isAuthenticated bool, isError bool, errorCode int, message ...string) {
 	<!DOCTYPE html>
-    <html lang="en" data-theme="neosharetheme">
-    	<head>
-    		<meta charset="utf-8"/>
-    		<title>NeoShare</title>
-            <link href="../assets/css/style.css" rel="stylesheet" type="text/css"/>
-            <script src="../assets/js/htmx.min.js"></script>
-            <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
-    	</head>
-    	<body>
-    		<main>
-    	        @component.Header(isAuthenticated)
-    			{ children... }
-    		</main>
-    	</body>
-    </html>
+	<html lang="en" data-theme="neosharetheme">
+		<head>
+			<meta charset="utf-8"/>
+			<title>NeoShare</title>
+			<link href="../assets/css/style.css" rel="stylesheet" type="text/css"/>
+			<script src="../assets/js/htmx.min.js"></script>
+			<script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
+		</head>
+		<body>
+			<header>
+				@component.Header(isAuthenticated)
+			</header>
+			<main>
+				{ children... }
+				if isError {
+					for _, msg := range message {
+						@component.ErrorToast(msg, errorCode)
+					}
+				} else {
+					for _, msg := range message {
+						@component.SuccessToast(msg)
+					}
+				}
+			</main>
+		</body>
+	</html>
 }

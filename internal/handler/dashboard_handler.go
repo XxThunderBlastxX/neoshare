@@ -35,7 +35,7 @@ func NewDashboardHandler(s3Service service.S3Service) DashboardHandler {
 
 func (d *dashboardHandler) DashboardView() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		render := adaptor.HTTPHandler(templ.Handler(page.DashboardPage()))
+		render := adaptor.HTTPHandler(templ.Handler(page.DashboardPage(false, 200, "")))
 
 		return render(ctx)
 	}
@@ -43,20 +43,18 @@ func (d *dashboardHandler) DashboardView() fiber.Handler {
 
 func (d *dashboardHandler) UploadHandler() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
+		render := adaptor.HTTPHandler(templ.Handler(page.DashboardPage(false, 200, "")))
+
 		fileHeader, err := ctx.FormFile("file")
 		if err != nil {
-			return ctx.Status(fiber.StatusBadRequest).JSON(model.WebResponse[*model.ErrorResponse]{
-				Error:   err.Error(),
-				Success: false,
-			})
+			render = adaptor.HTTPHandler(templ.Handler(page.UploadSection(true, fiber.StatusNotFound, "No file uploaded")))
+			return render(ctx)
 		}
 
 		file, err := fileHeader.Open()
 		if err != nil {
-			return ctx.Status(fiber.StatusInternalServerError).JSON(model.WebResponse[*model.ErrorResponse]{
-				Error:   err.Error(),
-				Success: false,
-			})
+			render = adaptor.HTTPHandler(templ.Handler(page.UploadSection(true, 404, err.Error())))
+			return render(ctx)
 		}
 		defer file.Close()
 
@@ -66,13 +64,11 @@ func (d *dashboardHandler) UploadHandler() fiber.Handler {
 
 		err = d.s3Service.UploadFile(key, contentType, fileHeader.Filename, file)
 		if err != nil {
-			return ctx.Status(fiber.StatusInternalServerError).JSON(model.WebResponse[*model.ErrorResponse]{
-				Error:   err.Error(),
-				Success: false,
-			})
+			render = adaptor.HTTPHandler(templ.Handler(page.UploadSection(true, fiber.StatusInternalServerError, err.Error())))
+			return render(ctx)
 		}
 
-		render := adaptor.HTTPHandler(templ.Handler(component.ShortLinkView(ctx.BaseURL() + "/" + key)))
+		render = adaptor.HTTPHandler(templ.Handler(component.ShortLinkView(ctx.BaseURL() + "/" + key)))
 
 		return render(ctx)
 	}
@@ -106,7 +102,7 @@ func (d *dashboardHandler) FilesView() fiber.Handler {
 				Success: false,
 			})
 		}
-		render := adaptor.HTTPHandler(templ.Handler(page.FilesPage(files)))
+		render := adaptor.HTTPHandler(templ.Handler(page.FilesPage(files, false, 200, "")))
 
 		return render(ctx)
 	}
