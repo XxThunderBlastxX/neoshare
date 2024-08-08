@@ -7,10 +7,13 @@ import (
 	"encoding/json"
 
 	contribJwt "github.com/gofiber/contrib/jwt"
+	"github.com/sujit-baniya/flash"
 
 	"github.com/go-resty/resty/v2"
 	"github.com/gofiber/fiber/v2"
 	"github.com/pkg/errors"
+
+	"github.com/XxThunderBlastxX/neoshare/internal/model"
 )
 
 func (m *Middleware) VerifyToken() fiber.Handler {
@@ -33,7 +36,12 @@ func (m *Middleware) VerifyToken() fiber.Handler {
 			return ctx.Next()
 		},
 		ErrorHandler: func(ctx *fiber.Ctx, err error) error {
-			return ctx.Status(fiber.StatusUnauthorized).Redirect("/login")
+			errRes := model.WebResponse{
+				Message:    "Authentication failed",
+				StatusCode: fiber.StatusUnauthorized,
+				Success:    false,
+			}
+			return flash.WithError(ctx, errRes.ConvertToMap()).Redirect("/login")
 		},
 		TokenLookup: "cookie:auth_token",
 	})

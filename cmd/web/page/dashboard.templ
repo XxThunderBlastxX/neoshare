@@ -29,7 +29,7 @@ templ UploadSection(message ...model.WebResponse) {
 				case true:
 					@component.SuccessToast(msg.Message)
 				case false:
-					@component.ErrorToast(msg.Error, msg.StatusCode)
+					@component.ErrorToast(msg.Message, msg.StatusCode)
 				default:
 			}
 		}

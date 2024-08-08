@@ -64,7 +64,7 @@ func (a *authHandler) LoginHandler() fiber.Handler {
 		state, err := generateRandomState()
 		if err != nil {
 			errRes := model.WebResponse{
-				Error:      err.Error(),
+				Message:    err.Error(),
 				StatusCode: fiber.StatusInternalServerError,
 				Success:    false,
 			}
@@ -75,7 +75,7 @@ func (a *authHandler) LoginHandler() fiber.Handler {
 		sess.Set("state", state)
 		if err := sess.Save(); err != nil {
 			errRes := model.WebResponse{
-				Error:      err.Error(),
+				Message:    err.Error(),
 				StatusCode: fiber.StatusInternalServerError,
 				Success:    false,
 			}
@@ -92,7 +92,7 @@ func (a *authHandler) CallbackHandler() fiber.Handler {
 		sess, _ := a.session.Get(ctx)
 		if ctx.Query("state") != sess.Get("state") {
 			errRes := model.WebResponse{
-				Error:      "Application state does not match",
+				Message:    "Application state does not match",
 				StatusCode: fiber.StatusInternalServerError,
 				Success:    false,
 			}
@@ -104,7 +104,7 @@ func (a *authHandler) CallbackHandler() fiber.Handler {
 		token, err := a.auth.Exchange(ctx.Context(), code, opt)
 		if err != nil {
 			errRes := model.WebResponse{
-				Error:      err.Error(),
+				Message:    err.Error(),
 				StatusCode: fiber.StatusInternalServerError,
 				Success:    false,
 			}
@@ -114,7 +114,7 @@ func (a *authHandler) CallbackHandler() fiber.Handler {
 		_, err = a.auth.VerifyIDToken(ctx.Context(), token)
 		if err != nil {
 			errRes := model.WebResponse{
-				Error:      err.Error(),
+				Message:    err.Error(),
 				StatusCode: fiber.StatusInternalServerError,
 				Success:    false,
 			}
