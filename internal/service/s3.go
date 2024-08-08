@@ -23,6 +23,7 @@ type S3Service interface {
 	UploadFile(key string, contentType string, fileName string, object io.Reader) error
 	DownloadFile(key string) ([]byte, error)
 	GetFiles() ([]model.File, error)
+	GetFileNameAndType(key string) (string, string, error)
 }
 
 func New(c *config.S3Config) S3Service {

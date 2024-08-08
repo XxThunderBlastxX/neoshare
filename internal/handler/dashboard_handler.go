@@ -99,8 +99,15 @@ func (d *dashboardHandler) DownloadHandler() fiber.Handler {
 			})
 		}
 
-		// TODO: Set the content type based on the file type
-		ctx.Set("Content-Type", "image/png")
+		_, contentType, err := d.s3Service.GetFileNameAndType(key)
+		if err != nil {
+			return ctx.Status(fiber.StatusInternalServerError).JSON(model.WebResponse{
+				Message:    err.Error(),
+				StatusCode: fiber.StatusInternalServerError,
+				Success:    false,
+			})
+		}
+		ctx.Set("Content-Type", contentType)
 
 		return ctx.Status(fiber.StatusOK).Send(file)
 	}

@@ -9,11 +9,11 @@ func (r *Router) DashboardRouter() {
 	h := handler.NewDashboardHandler(r.s3service)
 
 	// API Routes
-	api.Post("/upload", h.UploadHandler())
+	api.Post("/upload", r.middleware.VerifyToken(), h.UploadHandler())
 	api.Get("/download/:key", h.DownloadHandler())
 
 	// View Routes
-	view.Get("/dashboard", h.DashboardView())
-	view.Get("/files", h.FilesView())
+	view.Get("/dashboard", r.middleware.VerifyToken(), h.DashboardView())
+	view.Get("/files", r.middleware.VerifyToken(), h.FilesView())
 	view.Get("/:key", h.DownloadHandler())
 }

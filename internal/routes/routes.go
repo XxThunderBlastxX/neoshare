@@ -39,8 +39,5 @@ func (r *Router) RegisterRoutes() {
 	}))
 
 	r.AuthRouter()
-
-	r.app.Use(r.middleware.VerifyToken())
-
 	r.DashboardRouter()
 }
