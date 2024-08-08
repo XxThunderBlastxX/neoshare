@@ -24,6 +24,8 @@ tmp/
 
 # Miscelleneous file
 .env
+*.log
+
 
 
 # Project build

@@ -44,6 +44,30 @@ update:
 	@go get -u ./...
 	@go mod tidy -v
 
+# ==================================================================================== #
+# DOCKER FOR DB
+# ==================================================================================== #
+
+## Create DB container
+docker-run:
+	@if docker compose up -d 2>/dev/null; then \
+		: ; \
+	else \
+		echo "Falling back to Docker Compose V1"; \
+		docker-compose up -d; \
+	fi
+	@echo "DB container is up and running..."
+
+## Shutdown DB container
+docker-down:
+	@if docker compose down 2>/dev/null; then \
+		: ; \
+	else \
+		echo "Falling back to Docker Compose V1"; \
+		docker-compose down; \
+	fi
+	@echo "DB container is down..."
+
 
 # ==================================================================================== #
 # QUALITY CONTROL

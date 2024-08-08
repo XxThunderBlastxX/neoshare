@@ -9,10 +9,20 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
-func (m *Middleware) StyledLogger() fiber.Handler {
-	logFile, err := os.OpenFile("./bin/requests.log", os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
-	if err != nil {
-		log.Fatalf("error opening file: %v", err)
+func (m *Middleware) StyledLogger(appEnv string) fiber.Handler {
+	var logFile *os.File
+	if appEnv == "dev" {
+		file, err := os.OpenFile("./bin/requests.log", os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+		if err != nil {
+			log.Fatalf("error opening file: %v", err)
+		}
+		logFile = file
+	} else {
+		file, err := os.OpenFile("requests.log", os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+		if err != nil {
+			log.Fatalf("error opening file: %v", err)
+		}
+		logFile = file
 	}
 
 	logConfig := logger.Config{
