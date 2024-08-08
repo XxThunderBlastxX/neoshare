@@ -38,6 +38,8 @@ func (r *Router) RegisterRoutes() {
 		Browse:     false,
 	}))
 
+	r.app.Use(r.middleware.StyledLogger())
+
 	r.AuthRouter()
 	r.DashboardRouter()
 }
