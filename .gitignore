@@ -30,3 +30,4 @@ tmp/
 main
 *templ.go
 style.css
+bin/

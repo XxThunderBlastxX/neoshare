@@ -83,6 +83,7 @@ func (s *s3Service) DownloadFile(key string) ([]byte, error) {
 }
 
 func (s *s3Service) GetFiles() ([]model.File, error) {
+	// TODO : Implement to fetch from DB
 	var files []model.File
 
 	objects, err := s.client.ListObjectsV2(context.Background(), &s3.ListObjectsV2Input{
