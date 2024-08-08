@@ -27,7 +27,6 @@ templ Base(isAuthenticated bool, message ...model.WebResponse) {
 							@component.SuccessToast(msg.Message)
 						case false:
 							@component.ErrorToast(msg.Message, msg.StatusCode)
-						default:
 					}
 				}
 			</main>

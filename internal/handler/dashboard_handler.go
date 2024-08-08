@@ -7,7 +7,6 @@ import (
 	"github.com/a-h/templ"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/adaptor"
-	"github.com/sujit-baniya/flash"
 
 	"github.com/XxThunderBlastxX/neoshare/cmd/web/component"
 	"github.com/XxThunderBlastxX/neoshare/cmd/web/page"
@@ -109,22 +108,14 @@ func (d *dashboardHandler) DownloadHandler() fiber.Handler {
 
 func (d *dashboardHandler) FilesView() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		res := flash.Get(ctx)
-		if len(res) != 0 {
-			var resData model.WebResponse
-			resData.ConvertToStruct(res)
-			render := adaptor.HTTPHandler(templ.Handler(page.FilesPage([]model.File{}, resData)))
-			return render(ctx)
-		}
-
 		files, err := d.s3Service.GetFiles()
 		if err != nil {
-			errRes := model.WebResponse{
+			render := adaptor.HTTPHandler(templ.Handler(page.FilesPage([]model.File{}, model.WebResponse{
 				Message:    err.Error(),
 				StatusCode: fiber.StatusInternalServerError,
 				Success:    false,
-			}
-			return flash.WithError(ctx, errRes.ConvertToMap()).Redirect("/files")
+			})))
+			return render(ctx)
 		}
 		render := adaptor.HTTPHandler(templ.Handler(page.FilesPage(files)))
 
