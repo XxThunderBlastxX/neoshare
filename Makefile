@@ -38,6 +38,12 @@ watch:
 	    fi; \
 	fi
 
+## gen-repo: Generate the repository with sql queries provided
+.PHONY: gen-repo
+gen-repo:
+	@sqlc generate -f ./internal/database/sqlc.yaml
+	@echo "Repository generated..."
+
 ## update: Updates the packages and tidy the modfile
 .PHONY: update
 update:
@@ -49,6 +55,7 @@ update:
 # ==================================================================================== #
 
 ## Create DB container
+.PHONY: docker-up
 docker-run:
 	@if docker compose up -d 2>/dev/null; then \
 		: ; \
@@ -59,6 +66,7 @@ docker-run:
 	@echo "DB container is up and running..."
 
 ## Shutdown DB container
+.PHONY: docker-down
 docker-down:
 	@if docker compose down 2>/dev/null; then \
 		: ; \
