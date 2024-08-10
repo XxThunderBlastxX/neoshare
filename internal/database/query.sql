@@ -1,11 +1,11 @@
 -- name: ListFiles :many
-SELECT * FROM file;
+SELECT * FROM files;
 
 -- name: CreateFile :one
-INSERT INTO file (id, name, key, size, last_modified)
-VALUES ($1, $2, $3, $4, $5)
+INSERT INTO files (key, name, size, last_modified)
+VALUES ($1, $2, $3, $4)
 RETURNING *;
 
 -- name: DeleteProjectByKey :exec
-DELETE FROM file
+DELETE FROM files
 WHERE key = $1;

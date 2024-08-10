@@ -3,8 +3,6 @@ version: '3.8'
 services:
   psql:
     image: postgres:latest
-    env_file:
-      - .env
     environment:
       POSTGRES_DB: ${DB_DATABASE}
       POSTGRES_USER: ${DB_USERNAME}

@@ -9,9 +9,8 @@ import (
 )
 
 type File struct {
-	ID           int32
-	Name         string
 	Key          string
+	Name         string
 	Size         int32
 	LastModified time.Time
 }

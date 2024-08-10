@@ -11,32 +11,29 @@ import (
 )
 
 const createFile = `-- name: CreateFile :one
-INSERT INTO file (id, name, key, size, last_modified)
-VALUES ($1, $2, $3, $4, $5)
-RETURNING id, name, key, size, last_modified
+INSERT INTO files (key, name, size, last_modified)
+VALUES ($1, $2, $3, $4)
+RETURNING key, name, size, last_modified
 `
 
 type CreateFileParams struct {
-	ID           int32
-	Name         string
 	Key          string
+	Name         string
 	Size         int32
 	LastModified time.Time
 }
 
 func (q *Queries) CreateFile(ctx context.Context, arg CreateFileParams) (File, error) {
 	row := q.db.QueryRowContext(ctx, createFile,
-		arg.ID,
-		arg.Name,
 		arg.Key,
+		arg.Name,
 		arg.Size,
 		arg.LastModified,
 	)
 	var i File
 	err := row.Scan(
-		&i.ID,
-		&i.Name,
 		&i.Key,
+		&i.Name,
 		&i.Size,
 		&i.LastModified,
 	)
@@ -44,7 +41,7 @@ func (q *Queries) CreateFile(ctx context.Context, arg CreateFileParams) (File, e
 }
 
 const deleteProjectByKey = `-- name: DeleteProjectByKey :exec
-DELETE FROM file
+DELETE FROM files
 WHERE key = $1
 `
 
@@ -54,7 +51,7 @@ func (q *Queries) DeleteProjectByKey(ctx context.Context, key string) error {
 }
 
 const listFiles = `-- name: ListFiles :many
-SELECT id, name, key, size, last_modified FROM file
+SELECT key, name, size, last_modified FROM files
 `
 
 func (q *Queries) ListFiles(ctx context.Context) ([]File, error) {
@@ -67,9 +64,8 @@ func (q *Queries) ListFiles(ctx context.Context) ([]File, error) {
 	for rows.Next() {
 		var i File
 		if err := rows.Scan(
-			&i.ID,
-			&i.Name,
 			&i.Key,
+			&i.Name,
 			&i.Size,
 			&i.LastModified,
 		); err != nil {

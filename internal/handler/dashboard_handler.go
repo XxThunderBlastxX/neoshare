@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"io"
 	"strconv"
 	"time"
 
@@ -16,7 +17,8 @@ import (
 )
 
 type dashboardHandler struct {
-	s3Service service.S3Service
+	s3Service   service.S3Service
+	fileService service.FileService
 }
 
 type DashboardHandler interface {
@@ -27,9 +29,10 @@ type DashboardHandler interface {
 	FilesView() fiber.Handler
 }
 
-func NewDashboardHandler(s3Service service.S3Service) DashboardHandler {
+func NewDashboardHandler(s3Service service.S3Service, fileService service.FileService) DashboardHandler {
 	return &dashboardHandler{
-		s3Service: s3Service,
+		s3Service:   s3Service,
+		fileService: fileService,
 	}
 }
 
@@ -43,11 +46,9 @@ func (d *dashboardHandler) DashboardView() fiber.Handler {
 
 func (d *dashboardHandler) UploadHandler() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		render := adaptor.HTTPHandler(templ.Handler(page.DashboardPage()))
-
 		fileHeader, err := ctx.FormFile("file")
 		if err != nil {
-			render = adaptor.HTTPHandler(templ.Handler(page.UploadSection(model.WebResponse{
+			render := adaptor.HTTPHandler(templ.Handler(page.UploadSection(model.WebResponse{
 				Success:    false,
 				StatusCode: fiber.StatusNotFound,
 				Message:    "No file selected to upload",
@@ -57,7 +58,7 @@ func (d *dashboardHandler) UploadHandler() fiber.Handler {
 
 		file, err := fileHeader.Open()
 		if err != nil {
-			render = adaptor.HTTPHandler(templ.Handler(page.UploadSection(model.WebResponse{
+			render := adaptor.HTTPHandler(templ.Handler(page.UploadSection(model.WebResponse{
 				Message:    "Error occurred while opening the file",
 				StatusCode: fiber.StatusInternalServerError,
 				Success:    false,
@@ -66,21 +67,32 @@ func (d *dashboardHandler) UploadHandler() fiber.Handler {
 		}
 		defer file.Close()
 
-		key := utils.GenerateUID(strconv.FormatInt(time.Now().UnixNano(), 10))
-
-		contentType := fileHeader.Header.Get("Content-Type")
-
-		err = d.s3Service.UploadFile(key, contentType, fileHeader.Filename, file)
+		fileBuff, err := io.ReadAll(file)
 		if err != nil {
-			render = adaptor.HTTPHandler(templ.Handler(page.UploadSection(model.WebResponse{
-				Message:    "Error occurred while uploading the file",
+			render := adaptor.HTTPHandler(templ.Handler(page.UploadSection(model.WebResponse{
+				Message:    "Error occurred while reading the file",
 				StatusCode: fiber.StatusInternalServerError,
 				Success:    false,
 			})))
 			return render(ctx)
 		}
 
-		render = adaptor.HTTPHandler(templ.Handler(component.ShortLinkView(ctx.BaseURL() + "/" + key)))
+		var (
+			key         = utils.GenerateUID(strconv.FormatInt(time.Now().UnixNano(), 10))
+			contentType = fileHeader.Header.Get("Content-Type")
+		)
+
+		err = d.fileService.UploadFile(key, contentType, fileHeader.Filename, fileBuff)
+		if err != nil {
+			render := adaptor.HTTPHandler(templ.Handler(page.UploadSection(model.WebResponse{
+				Message:    err.Error(),
+				StatusCode: fiber.StatusInternalServerError,
+				Success:    false,
+			})))
+			return render(ctx)
+		}
+
+		render := adaptor.HTTPHandler(templ.Handler(component.ShortLinkView(ctx.BaseURL() + "/" + key)))
 
 		return render(ctx)
 	}
@@ -115,7 +127,7 @@ func (d *dashboardHandler) DownloadHandler() fiber.Handler {
 
 func (d *dashboardHandler) FilesView() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		files, err := d.s3Service.GetFiles()
+		files, err := d.fileService.GetFiles()
 		if err != nil {
 			render := adaptor.HTTPHandler(templ.Handler(page.FilesPage([]model.File{}, model.WebResponse{
 				Message:    err.Error(),

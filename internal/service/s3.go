@@ -1,8 +1,8 @@
 package service
 
 import (
+	"bytes"
 	"context"
-	"io"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/credentials"
@@ -20,7 +20,7 @@ type s3Service struct {
 }
 
 type S3Service interface {
-	UploadFile(key string, contentType string, fileName string, object io.Reader) error
+	UploadFile(key string, contentType string, fileName string, object []byte) error
 	DownloadFile(key string) ([]byte, error)
 	GetFiles() ([]model.File, error)
 	GetFileNameAndType(key string) (string, string, error)
@@ -40,7 +40,7 @@ func New(c *config.S3Config) S3Service {
 	}
 }
 
-func (s *s3Service) UploadFile(key string, contentType string, fileName string, object io.Reader) error {
+func (s *s3Service) UploadFile(key string, contentType string, fileName string, object []byte) error {
 	uploader := manager.NewUploader(s.client, func(u *manager.Uploader) {
 		u.Concurrency = 5
 		u.S3 = s.client
@@ -55,7 +55,7 @@ func (s *s3Service) UploadFile(key string, contentType string, fileName string, 
 	_, err := uploader.Upload(context.Background(), &s3.PutObjectInput{
 		Bucket:      aws.String(s.config.Bucket),
 		Key:         aws.String(key),
-		Body:        object,
+		Body:        bytes.NewReader(object),
 		ContentType: aws.String(contentType),
 		Metadata:    metaData,
 	})

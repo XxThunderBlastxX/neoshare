@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
@@ -8,6 +9,7 @@ import (
 	"github.com/XxThunderBlastxX/neoshare/cmd/web"
 	"github.com/XxThunderBlastxX/neoshare/internal/auth"
 	"github.com/XxThunderBlastxX/neoshare/internal/middleware"
+	"github.com/XxThunderBlastxX/neoshare/internal/repository"
 	"github.com/XxThunderBlastxX/neoshare/internal/server"
 	"github.com/XxThunderBlastxX/neoshare/internal/service"
 	"github.com/XxThunderBlastxX/neoshare/internal/session"
@@ -19,15 +21,21 @@ type Router struct {
 	sessionStore  *session.Session
 	middleware    *middleware.Middleware
 	s3service     service.S3Service
+	fileService   service.FileService
 }
 
 func New(app *server.Server) *Router {
+	s3Service := service.New(&app.Config.S3Config)
+
+	fileService := service.NewFileService(context.Background(), repository.New(app.Db), app.Db, s3Service)
+
 	return &Router{
 		app:           app,
 		authenticator: app.Authenticator,
 		sessionStore:  app.Session,
 		middleware:    middleware.New(app.Session, app.Authenticator),
-		s3service:     service.New(&app.Config.S3Config),
+		s3service:     s3Service,
+		fileService:   fileService,
 	}
 }
 
