@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"os"
 
@@ -25,11 +26,16 @@ func (m *Middleware) StyledLogger(appEnv string) fiber.Handler {
 		logFile = file
 	}
 
+	// Sets the log output to the file and stdout
+	mw := io.MultiWriter(os.Stdout, logFile)
+	log.SetOutput(mw)
+
 	logConfig := logger.Config{
 		Done: func(c *fiber.Ctx, logString []byte) {
 			fmt.Print(string(logString))
 		},
-		Output: logFile,
+		TimeFormat: "2006-01-02 15:04:05-0700",
+		Output:     logFile,
 	}
 
 	return logger.New(logConfig)

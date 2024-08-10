@@ -1,8 +1,7 @@
 package handler
 
 import (
-	"crypto/rand"
-	"encoding/base64"
+	"log"
 
 	"github.com/a-h/templ"
 	"github.com/gofiber/fiber/v2"
@@ -14,12 +13,14 @@ import (
 	"github.com/XxThunderBlastxX/neoshare/internal/auth"
 	"github.com/XxThunderBlastxX/neoshare/internal/model"
 	"github.com/XxThunderBlastxX/neoshare/internal/session"
+	"github.com/XxThunderBlastxX/neoshare/internal/utils"
 )
 
 type authHandler struct {
-	session       *session.Session
-	auth          *auth.Authenticator
-	authCookieKey string
+	session         *session.Session
+	auth            *auth.Authenticator
+	authCodeOptions oauth2.AuthCodeOption
+	authCookieKey   string
 }
 
 type AuthHandler interface {
@@ -30,16 +31,18 @@ type AuthHandler interface {
 	LoginView() fiber.Handler
 }
 
-func NewAuthHandler(sess *session.Session, auth *auth.Authenticator) AuthHandler {
+func NewAuthHandler(sess *session.Session, auth *auth.Authenticator, authAudience string, authCookieKey string) AuthHandler {
 	return &authHandler{
-		session:       sess,
-		auth:          auth,
-		authCookieKey: "auth_token",
+		session:         sess,
+		auth:            auth,
+		authCookieKey:   authCookieKey,
+		authCodeOptions: oauth2.SetAuthURLParam("audience", authAudience),
 	}
 }
 
 func (a *authHandler) LoginView() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
+		// Checks if there is any flash message as error
 		res := flash.Get(ctx)
 		if len(res) != 0 {
 			var resData model.WebResponse
@@ -48,20 +51,21 @@ func (a *authHandler) LoginView() fiber.Handler {
 			return render(ctx)
 		}
 
+		// Checks if the user is already authenticated then redirects to the dashboard
 		authCookie := ctx.Cookies(a.authCookieKey)
 		if authCookie != "" {
 			return ctx.Redirect("/dashboard")
 		}
 
+		// Rendering the login view page
 		render := adaptor.HTTPHandler(templ.Handler(page.AuthPage()))
-
 		return render(ctx)
 	}
 }
 
 func (a *authHandler) LoginHandler() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		state, err := generateRandomState()
+		state, err := utils.GenerateRandomState()
 		if err != nil {
 			errRes := model.WebResponse{
 				Message:    err.Error(),
@@ -82,8 +86,8 @@ func (a *authHandler) LoginHandler() fiber.Handler {
 			return flash.WithError(ctx, errRes.ConvertToMap()).Redirect("/login")
 		}
 
-		opt := oauth2.SetAuthURLParam("audience", "https://thunder.jp.auth0.com/api/v2/")
-		return ctx.Redirect(a.auth.AuthCodeURL(state, opt))
+		// Redirects to the OAuth2 provider consent page
+		return ctx.Redirect(a.auth.AuthCodeURL(state, a.authCodeOptions))
 	}
 }
 
@@ -91,6 +95,7 @@ func (a *authHandler) CallbackHandler() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		sess, _ := a.session.Get(ctx)
 		if ctx.Query("state") != sess.Get("state") {
+			log.Println("Application state does not match")
 			errRes := model.WebResponse{
 				Message:    "Application state does not match",
 				StatusCode: fiber.StatusInternalServerError,
@@ -100,9 +105,11 @@ func (a *authHandler) CallbackHandler() fiber.Handler {
 		}
 
 		code := ctx.Query("code")
-		opt := oauth2.SetAuthURLParam("audience", "https://thunder.jp.auth0.com/api/v2/")
-		token, err := a.auth.Exchange(ctx.Context(), code, opt)
+
+		// Converting the authorization code to token
+		token, err := a.auth.Exchange(ctx.Context(), code, a.authCodeOptions)
 		if err != nil {
+			log.Printf("Failed to exchange the code: %v", err)
 			errRes := model.WebResponse{
 				Message:    err.Error(),
 				StatusCode: fiber.StatusInternalServerError,
@@ -111,8 +118,10 @@ func (a *authHandler) CallbackHandler() fiber.Handler {
 			return flash.WithError(ctx, errRes.ConvertToMap()).Redirect("/login")
 		}
 
+		// Verifies the ID token
 		_, err = a.auth.VerifyIDToken(ctx.Context(), token)
 		if err != nil {
+			log.Printf("Failed to verify the ID token: %v", err)
 			errRes := model.WebResponse{
 				Message:    err.Error(),
 				StatusCode: fiber.StatusInternalServerError,
@@ -121,14 +130,17 @@ func (a *authHandler) CallbackHandler() fiber.Handler {
 			return flash.WithError(ctx, errRes.ConvertToMap()).Redirect("/login")
 		}
 
+		// Creates a new cookie with the access token
 		c := new(fiber.Cookie)
 		c.Name = a.authCookieKey
 		c.Value = token.AccessToken
 		c.Expires = token.Expiry
 		c.Secure = true
 
+		// Sets the cookie in the response
 		ctx.Cookie(c)
 
+		// Redirects to the dashboard
 		return ctx.Redirect("/dashboard")
 	}
 }
@@ -136,19 +148,7 @@ func (a *authHandler) CallbackHandler() fiber.Handler {
 func (a *authHandler) LogoutHandler() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		ctx.ClearCookie(a.authCookieKey)
-		return ctx.Redirect(a.auth.RevokeToken())
+		// TODO: Implement OIDC logout
+		return ctx.Redirect("/login")
 	}
-}
-
-// TODO: Refactor this to a separate package
-func generateRandomState() (string, error) {
-	b := make([]byte, 32)
-	_, err := rand.Read(b)
-	if err != nil {
-		return "", err
-	}
-
-	state := base64.StdEncoding.EncodeToString(b)
-
-	return state, nil
 }

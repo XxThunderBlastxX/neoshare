@@ -22,20 +22,22 @@ type Router struct {
 	middleware    *middleware.Middleware
 	s3service     service.S3Service
 	fileService   service.FileService
+	authCookieKey string
 }
 
 func New(app *server.Server) *Router {
+	authCookieKey := "auth_token"
 	s3Service := service.New(&app.Config.S3Config)
-
 	fileService := service.NewFileService(context.Background(), repository.New(app.Db), app.Db, s3Service)
 
 	return &Router{
 		app:           app,
 		authenticator: app.Authenticator,
 		sessionStore:  app.Session,
-		middleware:    middleware.New(app.Session, app.Authenticator),
+		middleware:    middleware.New(app.Session, app.Authenticator, authCookieKey),
 		s3service:     s3Service,
 		fileService:   fileService,
+		authCookieKey: authCookieKey,
 	}
 }
 

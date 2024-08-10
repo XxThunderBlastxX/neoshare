@@ -8,7 +8,12 @@ func (r *Router) AuthRouter() {
 	api := r.app.Group("/api")
 	view := r.app.Group("/")
 
-	authHandler := handler.NewAuthHandler(r.sessionStore, r.authenticator)
+	authHandler := handler.NewAuthHandler(
+		r.sessionStore,
+		r.authenticator,
+		r.app.Config.Auth.Audience,
+		r.authCookieKey,
+	)
 
 	// API Routes
 	api.Get("/login", authHandler.LoginHandler())

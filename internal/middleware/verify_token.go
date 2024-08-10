@@ -5,13 +5,13 @@ import (
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/json"
-
-	contribJwt "github.com/gofiber/contrib/jwt"
-	"github.com/sujit-baniya/flash"
+	"fmt"
 
 	"github.com/go-resty/resty/v2"
+	contribJwt "github.com/gofiber/contrib/jwt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/pkg/errors"
+	"github.com/sujit-baniya/flash"
 
 	"github.com/XxThunderBlastxX/neoshare/internal/model"
 )
@@ -36,6 +36,7 @@ func (m *Middleware) VerifyToken() fiber.Handler {
 			return ctx.Next()
 		},
 		ErrorHandler: func(ctx *fiber.Ctx, err error) error {
+			ctx.ClearCookie(m.authCookieKey)
 			errRes := model.WebResponse{
 				Message:    "Authentication failed",
 				StatusCode: fiber.StatusUnauthorized,
@@ -43,7 +44,7 @@ func (m *Middleware) VerifyToken() fiber.Handler {
 			}
 			return flash.WithError(ctx, errRes.ConvertToMap()).Redirect("/login")
 		},
-		TokenLookup: "cookie:auth_token",
+		TokenLookup: fmt.Sprintf("cookie:%s", m.authCookieKey),
 	})
 }
 
