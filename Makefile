@@ -13,10 +13,9 @@ DB_CONN_STRING := "postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT
 .PHONY: build
 build:
 	@echo "Building binary..."
-	@TEMPL_EXPERIMENT=rawgo templ generate
+	@templ generate
 	@pnpx tailwindcss -i cmd/web/assets/css/input.css -o cmd/web/assets/css/style.css
 	@go build -o bin/${BINARY_NAME} ${MAIN_PACKAGE}
-
 
 ## dev: Run the code development environment
 .PHONY: dev
@@ -90,7 +89,6 @@ migrate-up:
 migrate-down:
 	@GOOSE_DRIVER=postgres GOOSE_MIGRATION_DIR=${DB_MIGRATION_DIR} GOOSE_DBSTRING=${DB_CONN_STRING} goose down
 
-
 ## migrate-status: Displays about the migration status for the current DB
 .PHONY: migrate-status
 migrate-status:
@@ -100,8 +98,6 @@ migrate-status:
 .PHONY: sqlc-gen
 sqlc-gen:
 	@sqlc generate -f ./internal/database/sqlc.yaml
-
-
 
 # ==================================================================================== #
 # QUALITY CONTROL
