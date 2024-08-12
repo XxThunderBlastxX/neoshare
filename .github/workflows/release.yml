@@ -15,8 +15,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install bun
-        run: curl -fsSL https://bun.sh/install | bash
-        shell: bash
+        uses: oven-sh/setup-bun@v2
 
       - name: Set up Go
         uses: actions/setup-go@v4
