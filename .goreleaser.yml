@@ -42,10 +42,8 @@ archives:
 
 dockers:
   - image_templates:
-      - "ghcr.io/thunderblast/neoshare:{{ .Version }}"
-      - "ghcr.io/thunderblast/neoshare:latest"
-      - "yourdockerhubusername/yourrepositoryname:{{ .Version }}"
-      - "yourdockerhubusername/yourrepositoryname:latest"
+      - "ghcr.io/XxThunderBlastxX/neoshare:{{ .Version }}"
+      - "ghcr.io/XxThunderBlastxX/neoshare:latest"
     dockerfile: Dockerfile
     build_flag_templates:
       - "--pull"

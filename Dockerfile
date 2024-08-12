@@ -34,5 +34,5 @@ COPY --from=builder /app/bin/neoshare /app/neoshare
 # Expose the port the app runs on
 EXPOSE 8080
 
-# Run the binary
-CMD ["/app/neoshare"]
+# Entrypoint command for the container
+ENTRYPOINT ["/app/neoshare"]
