@@ -1,4 +1,6 @@
 version: 2
+project_name: neoshare
+
 before:
   hooks:
     - go mod tidy
@@ -37,6 +39,20 @@ archives:
       owner: root
     files:
       - README.md
+
+dockers:
+  - image_templates:
+      - "ghcr.io/thunderblast/neoshare:{{ .Version }}"
+      - "ghcr.io/thunderblast/neoshare:latest"
+      - "yourdockerhubusername/yourrepositoryname:{{ .Version }}"
+      - "yourdockerhubusername/yourrepositoryname:latest"
+    dockerfile: Dockerfile
+    build_flag_templates:
+      - "--pull"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
 
 checksum:
   name_template: 'checksums.txt'

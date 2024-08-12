@@ -26,10 +26,9 @@ tmp/
 .env
 *.log
 
-
-
 # Project build
 main
 *templ.go
 style.css
 bin/
+dist/

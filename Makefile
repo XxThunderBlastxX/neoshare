@@ -15,7 +15,7 @@ build:
 	@echo "Building binary..."
 	@templ generate
 	@pnpx tailwindcss -i cmd/web/assets/css/input.css -o cmd/web/assets/css/style.css
-	@go build -o bin/${BINARY_NAME} ${MAIN_PACKAGE}
+	@CGO_ENABLED=0 go build -o bin/${BINARY_NAME} ${MAIN_PACKAGE}
 
 ## dev: Run the code development environment
 .PHONY: dev
@@ -60,22 +60,22 @@ update:
 ## db-up: Create DB container
 .PHONY: db-up
 db-up:
-	@if docker compose up -d 2>/dev/null; then \
+	@if docker compose up -d psql 2>/dev/null; then \
 		: ; \
 	else \
 		echo "Falling back to Docker Compose V1"; \
-		docker-compose up -d; \
+		docker-compose up -d psql; \
 	fi
 	@echo "DB container is up and running..."
 
 ## db-down: Shutdown DB container
 .PHONY: db-down
 db-down:
-	@if docker compose down 2>/dev/null; then \
+	@if docker compose down psql 2>/dev/null; then \
 		: ; \
 	else \
 		echo "Falling back to Docker Compose V1"; \
-		docker-compose down; \
+		docker-compose down psql; \
 	fi
 	@echo "DB container is down..."
 
@@ -120,7 +120,7 @@ lint:
 .PHONY: test
 test:
 	@echo "Testing..."
-	@go test ./tests -v
+	@go test ./... -v
 
 # ==================================================================================== #
 # HELPERS
