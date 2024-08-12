@@ -2,11 +2,7 @@
 FROM golang:1.22.5-bullseye AS builder
 
 # Install Node.js
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
-    apt-get install -y nodejs
-
-# Install pnpm
-RUN npm install -g pnpm
+RUN curl -fsSL https://bun.sh/install | bash
 
 # Install go-templ
 RUN go install github.com/a-h/templ/cmd/templ@latest
