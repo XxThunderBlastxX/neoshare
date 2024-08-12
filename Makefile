@@ -14,7 +14,7 @@ DB_CONN_STRING := "postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT
 build:
 	@echo "Building binary..."
 	@templ generate
-	@pnpx tailwindcss -i cmd/web/assets/css/input.css -o cmd/web/assets/css/style.css
+	@bunx tailwindcss -i cmd/web/assets/css/input.css -o cmd/web/assets/css/style.css
 	@CGO_ENABLED=0 go build -o bin/${BINARY_NAME} ${MAIN_PACKAGE}
 
 ## dev: Run the code development environment

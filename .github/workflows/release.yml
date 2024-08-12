@@ -14,17 +14,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
-        name: Install pnpm
-        with:
-          version: 8
-          run_install: false
-
-      - name: Install Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
+      - name: Install bun
+        run: curl -fsSL https://bun.sh/install | bash
+        shell: bash
 
       - name: Set up Go
         uses: actions/setup-go@v4
@@ -41,7 +33,7 @@ jobs:
 
       - name: Build CSS file
         shell: bash
-        run: pnpx tailwindcss -i cmd/web/assets/css/input.css -o cmd/web/assets/css/style.css
+        run: bunx tailwindcss -i cmd/web/assets/css/input.css -o cmd/web/assets/css/style.css
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
