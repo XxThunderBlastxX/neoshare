@@ -2,6 +2,8 @@ name: goreleaser
 
 on:
   push:
+    branches:
+      - main
     tags:
       - "v*.*.*"
 
@@ -13,6 +15,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: 8
+          run_install: false
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
@@ -21,9 +36,14 @@ jobs:
       - name: Install templ
         shell: bash
         run: go install github.com/a-h/templ/cmd/templ@latest
+
       - name: Run templ generate
         shell: bash
         run: templ generate -path .
+
+      - name: Build CSS file
+        shell: bash
+        run: pnpx tailwindcss -i cmd/web/assets/css/input.css -o cmd/web/assets/css/style.css
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
@@ -33,4 +53,4 @@ jobs:
           args: release --clean
           workdir: ./
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.NS_GH_ACTIONS }}

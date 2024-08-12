@@ -1,21 +1,35 @@
 package layout
 
-import "github.com/XxThunderBlastxX/neoshare/cmd/web/component"
+import (
+	"github.com/XxThunderBlastxX/neoshare/cmd/web/component"
+	"github.com/XxThunderBlastxX/neoshare/internal/model"
+)
 
-templ Base() {
+templ Base(isAuthenticated bool, message ...model.WebResponse) {
 	<!DOCTYPE html>
-    <html lang="en">
-    	<head>
-    		<meta charset="utf-8"/>
-    		<title>Thunder Share</title>
-            <link href="../assets/css/style.css" rel="stylesheet"/>
-    		<script src="https://unpkg.com/htmx.org@2.0.1" integrity="sha384-QWGpdj554B4ETpJJC9z+ZHJcA/i59TyjxEPXiiUgN2WmTyV5OEZWCD6gQhgkdpB/" crossorigin="anonymous"></script>
-    	</head>
-    	<body>
-    		<main>
-    	        @component.Header()
-    			{ children... }
-    		</main>
-    	</body>
-    </html>
+	<html lang="en" data-theme="neosharetheme">
+		<head>
+			<meta charset="utf-8"/>
+			<title>NeoShare</title>
+			<link href="../assets/css/style.css" rel="stylesheet" type="text/css"/>
+			<script src="https://unpkg.com/htmx.org@2.0.1" integrity="sha384-QWGpdj554B4ETpJJC9z+ZHJcA/i59TyjxEPXiiUgN2WmTyV5OEZWCD6gQhgkdpB/" crossorigin="anonymous"></script>
+			<script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
+		</head>
+		<body>
+			<header>
+				@component.Header(isAuthenticated)
+			</header>
+			<main>
+				{ children... }
+				for _, msg := range message {
+					switch msg.Success {
+						case true:
+							@component.SuccessToast(msg.Message)
+						case false:
+							@component.ErrorToast(msg.Message, msg.StatusCode)
+					}
+				}
+			</main>
+		</body>
+	</html>
 }

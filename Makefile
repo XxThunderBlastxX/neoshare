@@ -1,5 +1,9 @@
+include .env
+
 MAIN_PACKAGE := ./cmd/api/main.go
 BINARY_NAME := neoshare
+DB_MIGRATION_DIR := ./internal/database/migrations
+DB_CONN_STRING := "postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_DATABASE}?sslmode=disable"
 
 # ==================================================================================== #
 # DEVELOPMENT
@@ -11,14 +15,13 @@ build:
 	@echo "Building binary..."
 	@templ generate
 	@pnpx tailwindcss -i cmd/web/assets/css/input.css -o cmd/web/assets/css/style.css
-	@go build -o bin/$(BINARY_NAME) $(MAIN_PACKAGE)
-
+	@CGO_ENABLED=0 go build -o bin/${BINARY_NAME} ${MAIN_PACKAGE}
 
 ## dev: Run the code development environment
 .PHONY: dev
 dev:
 	@echo "Running development environment..."
-	@go run $(MAIN_PACKAGE)
+	@go run ${MAIN_PACKAGE}
 
 ## watch: Run the application with reloading on file changes
 .PHONY: watch
@@ -38,12 +41,63 @@ watch:
 	    fi; \
 	fi
 
+## gen-repo: Generate the repository with sql queries provided
+.PHONY: gen-repo
+gen-repo:
+	@sqlc generate -f ./internal/database/sqlc.yaml
+	@echo "Repository generated..."
+
 ## update: Updates the packages and tidy the modfile
 .PHONY: update
 update:
 	@go get -u ./...
 	@go mod tidy -v
 
+# ==================================================================================== #
+# Database
+# ==================================================================================== #
+
+## db-up: Create DB container
+.PHONY: db-up
+db-up:
+	@if docker compose up -d psql 2>/dev/null; then \
+		: ; \
+	else \
+		echo "Falling back to Docker Compose V1"; \
+		docker-compose up -d psql; \
+	fi
+	@echo "DB container is up and running..."
+
+## db-down: Shutdown DB container
+.PHONY: db-down
+db-down:
+	@if docker compose down psql 2>/dev/null; then \
+		: ; \
+	else \
+		echo "Falling back to Docker Compose V1"; \
+		docker-compose down psql; \
+	fi
+	@echo "DB container is down..."
+
+## migrate-up: Migrate to up the table schema
+.PHONY: migrate-up
+migrate-up:
+	@GOOSE_DRIVER=postgres GOOSE_MIGRATION_DIR=${DB_MIGRATION_DIR} GOOSE_DBSTRING=${DB_CONN_STRING} goose up
+
+## migrate-down: Migrate to down the table schema
+.PHONY: migrate-down
+migrate-down:
+	@GOOSE_DRIVER=postgres GOOSE_MIGRATION_DIR=${DB_MIGRATION_DIR} GOOSE_DBSTRING=${DB_CONN_STRING} goose down
+
+## migrate-status: Displays about the migration status for the current DB
+.PHONY: migrate-status
+migrate-status:
+	@GOOSE_DRIVER=postgres GOOSE_MIGRATION_DIR=${DB_MIGRATION_DIR} GOOSE_DBSTRING=${DB_CONN_STRING} goose status
+
+## sqlc-gen: Generate the sqlc queries
+.PHONY: sqlc-gen
+sqlc-gen:
+	@sqlc generate -f ./internal/database/sqlc.yaml
 
 # ==================================================================================== #
 # QUALITY CONTROL
@@ -66,7 +120,7 @@ lint:
 .PHONY: test
 test:
 	@echo "Testing..."
-	@go test ./tests -v
+	@go test ./... -v
 
 # ==================================================================================== #
 # HELPERS

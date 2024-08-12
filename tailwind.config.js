@@ -4,8 +4,8 @@ module.exports = {
         "./cmd/web/**/*.html",
         "./cmd/web/**/*.templ",
     ],
+    plugins: [],
     theme: {
         extend: {},
     },
-    plugins: [],
 }

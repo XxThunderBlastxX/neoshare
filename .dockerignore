@@ -1,0 +1,21 @@
+# Miscellaneous
+bin
+LICENCE
+README.md
+.gitignore
+.air.toml
+.golangci.yaml
+.env.example
+
+# JetBrains
+.idea
+
+# VSCode
+.vscode
+
+# GitHub
+.github
+
+# MacOS
+.DS_Store
+

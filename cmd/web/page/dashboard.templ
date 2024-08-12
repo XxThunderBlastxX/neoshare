@@ -1,0 +1,37 @@
+package page
+
+import (
+	"github.com/XxThunderBlastxX/neoshare/cmd/web/component"
+	"github.com/XxThunderBlastxX/neoshare/cmd/web/layout"
+	"github.com/XxThunderBlastxX/neoshare/internal/model"
+)
+
+templ DashboardPage(message ...model.WebResponse) {
+	@layout.Base(true, message...) {
+		@UploadSection(message...)
+	}
+}
+
+templ UploadSection(message ...model.WebResponse) {
+	<section id="upload-view" class="px-12">
+		<div>
+			<h1 class="text-3xl">Upload</h1>
+			<form class="mt-12" hx-post="/api/upload" method="post" hx-encoding="multipart/form-data" hx-swap="outerHTML" hx-target="#upload-view" hx-indicator="#indicator">
+				<input type="file" name="file"/>
+				<button class="btn">
+					Upload
+					<span id="indicator" class="pl-3 loading loading-spinner loading-md htmx-indicator"></span>
+				</button>
+			</form>
+		</div>
+		for _, msg := range message {
+			switch msg.Success {
+				case true:
+					@component.SuccessToast(msg.Message)
+				case false:
+					@component.ErrorToast(msg.Message, msg.StatusCode)
+				default:
+			}
+		}
+	</section>
+}

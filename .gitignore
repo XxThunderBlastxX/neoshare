@@ -24,9 +24,11 @@ tmp/
 
 # Miscelleneous file
 .env
-
+*.log
 
 # Project build
 main
 *templ.go
 style.css
+bin/
+dist/
