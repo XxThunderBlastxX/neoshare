@@ -48,7 +48,7 @@ dockers:
     goarch: amd64
     goos: linux
     build_flag_templates:
-      - "-- platform=linux/amd64"
+      - "--platform=linux/amd64"
       - "--label=org.opencontainers.image.title={{ .ProjectName }}"
       - "--label=org.opencontainers.image.description={{ .ProjectName }}"
       - "--label=org.opencontainers.image.url=https://github.com/xxthunderblastxx/{{ .ProjectName }}"
