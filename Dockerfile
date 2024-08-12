@@ -1,7 +1,8 @@
 # Stage 1: Build the application
 FROM golang:1.22.5-bullseye AS builder
 
-# Install Node.js
+# Install Bun
+RUN apt install unzip
 RUN curl -fsSL https://bun.sh/install | bash
 
 # Install go-templ
