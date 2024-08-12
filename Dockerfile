@@ -1,14 +1,14 @@
 # Stage 1: Build the application
-FROM golang:1.22.5-bullseye AS builder
-
-# Set the working directory
-WORKDIR /app
-
-# Copy the source code
-COPY . .
-
-# Build the application
-RUN CGO_ENABLED=0 go build -o bin/neoshare ./cmd/api/main.go
+#FROM golang:1.22.5-bullseye AS builder
+#
+## Set the working directory
+#WORKDIR /app
+#
+## Copy the source code
+#COPY . .
+#
+## Build the application
+#RUN CGO_ENABLED=0 go build -o bin/neoshare ./cmd/api/main.go
 
 # Stage 2: Create the runtime image
 FROM alpine:latest
