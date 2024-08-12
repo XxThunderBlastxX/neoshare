@@ -1,28 +1,9 @@
-# Stage 1: Build the application
-#FROM golang:1.22.5-bullseye AS builder
-#
-## Set the working directory
-#WORKDIR /app
-#
-## Copy the source code
-#COPY . .
-#
-## Build the application
-#RUN CGO_ENABLED=0 go build -o bin/neoshare ./cmd/api/main.go
-
-# Stage 2: Create the runtime image
 FROM alpine:latest
 
 RUN apk --no-cache add ca-certificates
 
-# Set the working directory
-WORKDIR /app
+COPY neoshare /usr/bin/neoshare
 
-# Copy the binary from the builder stage
-COPY --from=builder /app/bin/neoshare /app/neoshare
-
-# Expose the port the app runs on
 EXPOSE 8080
 
-# Entrypoint command for the container
-ENTRYPOINT ["/app/neoshare"]
+ENTRYPOINT ["/usr/bin/neoshare"]
