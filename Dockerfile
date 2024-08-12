@@ -2,6 +2,7 @@
 FROM golang:1.22.5-bullseye AS builder
 
 # Install Bun
+RUN apt-get update
 RUN apt install unzip
 RUN curl -fsSL https://bun.sh/install | bash
 
