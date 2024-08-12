@@ -1,22 +1,14 @@
 # Stage 1: Build the application
 FROM golang:1.22.5-bullseye AS builder
 
-# Install Bun
-RUN apt-get update
-RUN apt install unzip
-RUN curl -fsSL https://bun.sh/install | bash
-
-# Install go-templ
-RUN go install github.com/a-h/templ/cmd/templ@latest
-
 # Set the working directory
 WORKDIR /app
 
 # Copy the source code
 COPY . .
 
-# Install dependencies and build the application
-RUN make build
+# Build the application
+RUN CGO_ENABLED=0 go build -o bin/neoshare ./cmd/api/main.go
 
 # Stage 2: Create the runtime image
 FROM alpine:latest
