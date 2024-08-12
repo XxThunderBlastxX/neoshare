@@ -3,7 +3,7 @@ module github.com/XxThunderBlastxX/neoshare
 go 1.22.5
 
 require (
-	github.com/XxThunderBlastxX/goconfigenv v1.1.0
+	github.com/XxThunderBlastxX/goconfigenv v1.1.3
 	github.com/a-h/templ v0.2.747
 	github.com/aws/aws-sdk-go-v2 v1.30.3
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.27
