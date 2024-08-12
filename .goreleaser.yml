@@ -1,13 +1,10 @@
 version: 2
 project_name: neoshare
-
 before:
   hooks:
     - go mod tidy
-
 env:
   - PACKAGE_PATH=github.com/XxThunderBlastxX/neoshare/cmd
-
 builds:
   - binary: "{{ .ProjectName }}"
     main: ./cmd/api
@@ -24,10 +21,8 @@ builds:
       - -s -w -X {{.Env.PACKAGE_PATH}}={{.Version}}
 release:
   prerelease: auto
-
 universal_binaries:
   - replace: true
-
 archives:
   - name_template: >
       {{- .ProjectName }}_{{- .Version }}_{{- title .Os }}_{{- if eq .Arch "amd64" }}x86_64{{- else if eq .Arch "386" }}i386{{- else }}{{ .Arch }}{{ end }}{{- if .Arm }}v{{ .Arm }}{{ end -}}
@@ -39,7 +34,6 @@ archives:
       owner: root
     files:
       - README.md
-
 dockers:
   - image_templates:
       - "ghcr.io/xxthunderblastxx/{{ .ProjectName }}:{{ .Version }}-amd64"
@@ -73,7 +67,6 @@ dockers:
       - "--label=org.opencontainers.image.created={{ time ""2006-01-02T15:04:05Z07:00"" }}"
       - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
       - "--label=org.opencontainers.image.licenses=MIT"
-
 docker_manifests:
   - name_template: "ghcr.io/xxthunderblastxx/{{ .ProjectName }}:{{ .Version }}"
     image_templates:
@@ -83,6 +76,5 @@ docker_manifests:
     image_templates:
       - "ghcr.io/xxthunderblastxx/{{ .ProjectName }}:{{ .Version }}-amd64"
       - "ghcr.io/xxthunderblastxx/{{ .ProjectName }}:{{ .Version }}-arm64v8"
-
 checksum:
   name_template: 'checksums.txt'
