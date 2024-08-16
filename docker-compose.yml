@@ -3,7 +3,7 @@ version: '3.8'
 services:
   api:
     container_name: neoshare_api
-    image: ${REGISTRY}/${PROJECT_NAME}:latest
+    image: ghcr.io/xxthunderblastxx/neoshare:latest
     networks:
       - neoshare
     environment:

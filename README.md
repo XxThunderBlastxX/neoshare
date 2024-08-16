@@ -65,16 +65,16 @@ There are many file sharing services available in the market, but none is like N
 
 ## 🌐Deployment
 
-- From Source :- From source it is very straight forward to build. You can build the single binary using this following command :-  
+- **From Source** :- From source it is very straight forward to build. You can build the single binary using this following command :-  
 
 ```bash
-    make build
+  make build
 ```
 This will generate a binary file named `neoshare` at `./bin` dir of this project. You can run this binary file to start the server with the environment variables mentioned above.<br/><br/>
 You also need to setup a postgres database , preferably local or using docker. You can run spin up the DB in docker from docker-compose file provided in the project. Just run this command :- 
 
 ```bash
-    make db-up
+  make db-up
 ```
 
 >[!IMPORTANT]
@@ -82,6 +82,11 @@ You also need to setup a postgres database , preferably local or using docker. Y
 > TEMPL is required to generate the `*_templ.go` files from `.templ` files & NodeJS is used to build 
 > `styles.css` file which is compiled from `tailwindcss` CLI**
 
+- **From Docker Compose** :- You can run the application using the docker compose script provided. Also copy the `.env.example` file to `.env` and fill the environment variables. Then run the following command :- 
+
+```bash
+  docker compose up
+```
 
 ## 📄 License
 
