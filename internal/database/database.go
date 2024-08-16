@@ -2,23 +2,42 @@ package database
 
 import (
 	"database/sql"
+	"embed"
 	"fmt"
+	"log"
 
 	_ "github.com/lib/pq"
+	"github.com/pressly/goose/v3"
 
 	"github.com/XxThunderBlastxX/neoshare/internal/config"
 )
 
-// ConnectDB connects to a postgresql database
-func ConnectDB(dbConfig *config.DBConfig) (*sql.DB, error) {
+//go:embed migrations/*.sql
+var embedMigrations embed.FS
+
+// MustConnectDB connects to a postgresql database
+func MustConnectDB(dbConfig *config.DBConfig) *sql.DB {
 	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", dbConfig.DBUser, dbConfig.DBPassword, dbConfig.DBHost, dbConfig.DBPort, dbConfig.DBName)
 
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
-		return nil, fmt.Errorf("☹️Failed to connect to database: %w", err)
+		panic(err)
 	}
 
-	fmt.Println("🎉 Database connected !!!")
+	if err := db.Ping(); err != nil {
+		panic(err)
+	}
 
-	return db, nil
+	goose.SetBaseFS(embedMigrations)
+	if err := goose.SetDialect("postgres"); err != nil {
+		panic(err)
+	}
+
+	if err := goose.Up(db, "migrations"); err != nil {
+		panic(err)
+	}
+
+	log.Println("🎉 Database connected !!!")
+
+	return db
 }

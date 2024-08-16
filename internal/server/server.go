@@ -31,10 +31,7 @@ func New() *Server {
 		panic(err)
 	}
 
-	db, err := database.ConnectDB(&c.DBConfig)
-	if err != nil {
-		panic(err)
-	}
+	db := database.MustConnectDB(&c.DBConfig)
 
 	server := &Server{
 		App: fiber.New(fiber.Config{
