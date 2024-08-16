@@ -1,10 +1,8 @@
 package middleware
 
 import (
-	"fmt"
 	"log"
 
-	contribJwt "github.com/gofiber/contrib/jwt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sujit-baniya/flash"
 
@@ -12,24 +10,40 @@ import (
 )
 
 func (m *Middleware) VerifyToken() fiber.Handler {
-	jwksUri, _ := m.auth.JwksUri()
-
-	return contribJwt.New(contribJwt.Config{
-		Filter:     nil,
-		JWKSetURLs: []string{jwksUri},
-		SuccessHandler: func(ctx *fiber.Ctx) error {
-			return ctx.Next()
-		},
-		ErrorHandler: func(ctx *fiber.Ctx, err error) error {
-			log.Println(err)
-			ctx.ClearCookie(m.authCookieKey)
-			errRes := model.WebResponse{
-				Message:    "Authentication failed",
-				StatusCode: fiber.StatusUnauthorized,
+	return func(ctx *fiber.Ctx) error {
+		// Get the JWT token from the cookie
+		tokenString := ctx.Cookies(m.authCookieKey)
+		if tokenString == "" {
+			log.Println("No JWT token found in the cookie")
+			res := model.WebResponse{
 				Success:    false,
+				StatusCode: fiber.StatusUnauthorized,
+				Message:    "Unauthorized access",
 			}
-			return flash.WithError(ctx, errRes.ConvertToMap()).Redirect("/login")
-		},
-		TokenLookup: fmt.Sprintf("cookie:%s", m.authCookieKey),
-	})
+			return flash.WithError(ctx, res.ConvertToMap()).Redirect("/login")
+		}
+
+		ok, err := m.auth.VerifyUserInfo(tokenString)
+		if err != nil {
+			log.Println("Error verifying Access token: ", err)
+			res := model.WebResponse{
+				Success:    false,
+				StatusCode: fiber.StatusUnauthorized,
+				Message:    "Unauthorized access",
+			}
+			return flash.WithError(ctx, res.ConvertToMap()).Redirect("/login")
+		}
+
+		if !ok {
+			log.Println("Invalid token found")
+			res := model.WebResponse{
+				Success:    false,
+				StatusCode: fiber.StatusUnauthorized,
+				Message:    "Unauthorized access",
+			}
+			return flash.WithError(ctx, res.ConvertToMap()).Redirect("/login")
+		}
+
+		return ctx.Next()
+	}
 }

@@ -16,6 +16,7 @@ type AuthConfig struct {
 	CallbackURL  string `env:"AUTH_CALLBACK_URL"`
 	Domain       string `env:"AUTH_DOMAIN"`
 	Audience     string `env:"AUTH_AUDIENCE"`
+	UserInfoURL  string `env:"AUTH_USER_INFO_URL"`
 }
 
 type S3Config struct {
