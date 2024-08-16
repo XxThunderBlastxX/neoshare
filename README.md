@@ -40,15 +40,17 @@ There are many file sharing services available in the market, but none is like N
 | `S3_SECRET_KEY`      | Secret Key provided from your dashboard to access your S3 instance. |
 | `S3_BUCKET`          | Name of the Bucket at which you want to store all your files.       |
 
-- OIDC Auth Environment Variables
+- OIDC/Auth0 2.0 Auth Environment Variables
 
-| Environment Variable | Meaning                                                                                                                                                           |
-|----------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `AUTH_CLIENT_ID`     | Client ID provided by your OIDC auth provider.                                                                                                                    |
-| `AUTH_CLIENT_SECRET` | Client Secret provided by your OIDC auth provider.                                                                                                                |
-| `AUTH_CALLBACK_URL`  | URL at which your application will comeback after successfully login.(default: `/callback`)                                                                       |
-| `AUTH_DOMAIN`        | The Authentication domain of your auth provider, can be recived from your provider dashboard. **NOTE: Dont provide the domain with any `http://` or `https://`.** |
-| `AUTH_AUDIENCE`      | Audience URL of your provider Auth API/Resource.                                                                                                                  |
+| Environment Variable        | Meaning                                                                                                                                                     |
+|-----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `AUTH_CLIENT_ID`            | Client ID provided by your OIDC auth provider.                                                                                                              |
+| `AUTH_CLIENT_SECRET`        | Client Secret provided by your OIDC auth provider.                                                                                                          |
+| `AUTH_CALLBACK_URL`         | URL at which your application will comeback after successfully login.(default: `/callback`)                                                                 |
+| `AUTH_DOMAIN`               | The Authentication domain of your auth provider, can be recived from your provider dashboard. **NOTE: Do provide the domain with `http://` or `https://`.** |
+| `AUTH_AUDIENCE`             | Audience URL of your provider Auth API/Resource. (Required when you are using Auth0)                                                                        |
+| `AUTH_USER_INFO_URL`        | URL to fetch User Info with a valid access token.                                                                                                           |
+| `AUTH_LOGOUT_CALLBACK_URL`  | The route of the application at which the provider will callback after logging out from the application.                                                    |
 
 - Postgres DB Environment Variables
 
