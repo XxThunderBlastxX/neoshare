@@ -43,6 +43,9 @@ func New(app *server.Server) *Router {
 }
 
 func (r *Router) RegisterRoutes() {
+	// Setting up the logging middleware
+	r.app.Use(r.middleware.StyledLogger(r.app.Config.AppEnv))
+
 	// Serve static files
 	r.app.Use("/assets", filesystem.New(filesystem.Config{
 		Root:       http.FS(web.Files),
@@ -56,8 +59,10 @@ func (r *Router) RegisterRoutes() {
 		CacheControl: "public, max-age=31536000",
 	}))
 
-	r.app.Use(r.middleware.StyledLogger(r.app.Config.AppEnv))
+	// Setting up the rate limiter middleware
+	r.app.Use(r.middleware.RateLimiter())
 
+	// Registering the routes
 	r.AuthRouter()
 	r.DashboardRouter()
 }

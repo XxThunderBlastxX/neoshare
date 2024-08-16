@@ -37,6 +37,7 @@ There are many file sharing services available in the market, but none is like N
 |----------------------|------------------------------------------------------------------------------------------------------------------------|
 | `PORT`               | TCP port on which to listen for HTTP connections. (default: `8080`)                                                    |
 | `APP_ENV`            | It tells the program about the environment in which it is running. It can either take `dev` or `prod`. (default:`dev`) |
+| `FAVICON_URI`        | Use this variable to customize the favicon by setting this variable with the favicon URI of your choice.               |
 
 - S3 Environment Variables
 
