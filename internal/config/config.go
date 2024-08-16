@@ -3,11 +3,12 @@ package config
 import "github.com/XxThunderBlastxX/goconfigenv"
 
 type AppConfig struct {
-	AppEnv   string `env:"APP_ENV,default=dev"` // This is either dev or prod (default: dev)
-	Port     int    `env:"PORT,default=8080"`
-	Auth     AuthConfig
-	S3Config S3Config
-	DBConfig DBConfig
+	AppEnv     string `env:"APP_ENV,default=dev"` // This is either dev or prod (default: dev)
+	Port       int    `env:"PORT,default=8080"`
+	FaviconUri string `env:"FAVICON_URI,default=https://koustav.dev/favicon.ico"`
+	Auth       AuthConfig
+	S3Config   S3Config
+	DBConfig   DBConfig
 }
 
 type AuthConfig struct {

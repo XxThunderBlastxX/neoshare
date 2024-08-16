@@ -9,12 +9,15 @@ import (
 	"github.com/XxThunderBlastxX/neoshare/internal/config"
 	"github.com/XxThunderBlastxX/neoshare/internal/database"
 	"github.com/XxThunderBlastxX/neoshare/internal/session"
+	"github.com/XxThunderBlastxX/neoshare/internal/utils"
 )
 
 type Server struct {
 	*fiber.App
 
 	Config *config.AppConfig
+
+	Favicon []byte
 
 	Session *session.Session
 
@@ -33,12 +36,15 @@ func New() *Server {
 
 	db := database.MustConnectDB(&c.DBConfig)
 
+	icon, _ := utils.GetFavicon(c.FaviconUri)
+
 	server := &Server{
 		App: fiber.New(fiber.Config{
 			AppName:   "NeoShare",
 			BodyLimit: 10 * 1024 * 1024 * 1024,
 		}),
 		Config:        c,
+		Favicon:       icon,
 		Session:       session.New(),
 		Authenticator: a,
 		Db:            db,

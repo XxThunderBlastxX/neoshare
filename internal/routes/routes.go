@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/gofiber/fiber/v2/middleware/favicon"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
 
 	"github.com/XxThunderBlastxX/neoshare/cmd/web"
@@ -42,10 +43,17 @@ func New(app *server.Server) *Router {
 }
 
 func (r *Router) RegisterRoutes() {
+	// Serve static files
 	r.app.Use("/assets", filesystem.New(filesystem.Config{
 		Root:       http.FS(web.Files),
 		PathPrefix: "assets",
 		Browse:     false,
+	}))
+
+	// Setting favicon for the application
+	r.app.Use(favicon.New(favicon.Config{
+		Data:         r.app.Favicon,
+		CacheControl: "public, max-age=31536000",
 	}))
 
 	r.app.Use(r.middleware.StyledLogger(r.app.Config.AppEnv))
