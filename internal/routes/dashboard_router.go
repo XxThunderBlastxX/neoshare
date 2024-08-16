@@ -15,5 +15,5 @@ func (r *Router) DashboardRouter() {
 	// View Routes
 	view.Get("/dashboard", r.middleware.VerifyToken(), h.DashboardView())
 	view.Get("/files", r.middleware.VerifyToken(), h.FilesView())
-	view.Get("/:key", h.DownloadHandler())
+	view.Get("/v/:key", h.DownloadHandler())
 }

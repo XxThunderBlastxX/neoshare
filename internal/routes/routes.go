@@ -34,7 +34,7 @@ func New(app *server.Server) *Router {
 		app:           app,
 		authenticator: app.Authenticator,
 		sessionStore:  app.Session,
-		middleware:    middleware.New(app.Session, app.Authenticator, authCookieKey),
+		middleware:    middleware.New(app.Session, app.Authenticator, authCookieKey, app.Config.Auth.Domain),
 		s3service:     s3Service,
 		fileService:   fileService,
 		authCookieKey: authCookieKey,

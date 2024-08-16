@@ -8,13 +8,15 @@ import (
 type Middleware struct {
 	session       *session.Session
 	auth          *auth.Authenticator
+	authDomain    string
 	authCookieKey string
 }
 
-func New(s *session.Session, a *auth.Authenticator, authCookieKey string) *Middleware {
+func New(s *session.Session, a *auth.Authenticator, authCookieKey string, authDomain string) *Middleware {
 	return &Middleware{
 		session:       s,
 		auth:          a,
 		authCookieKey: authCookieKey,
+		authDomain:    authDomain,
 	}
 }

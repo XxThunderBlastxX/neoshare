@@ -2,7 +2,9 @@ package utils
 
 import (
 	"crypto/rand"
+	"crypto/sha256"
 	"encoding/base64"
+	mathRand "math/rand"
 	"strings"
 	"unicode"
 )
@@ -30,4 +32,20 @@ func RemoveNonAsciiValue(s string) string {
 	}, s)
 
 	return s
+}
+
+func GenerateCodeVerifier() string {
+	const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~"
+	const length = 128
+
+	b := make([]byte, length)
+	for i := range b {
+		b[i] = charset[mathRand.Intn(len(charset))]
+	}
+	return string(b)
+}
+
+func GenerateCodeChallenge(verifier string) string {
+	hash := sha256.Sum256([]byte(verifier))
+	return base64.RawURLEncoding.EncodeToString(hash[:])
 }

@@ -75,8 +75,13 @@ func (a *authHandler) LoginHandler() fiber.Handler {
 			return flash.WithError(ctx, errRes.ConvertToMap()).Redirect("/login")
 		}
 
+		// Generate PKCE code verifier and challenge
+		codeVerifier := utils.GenerateCodeVerifier()
+		codeChallenge := utils.GenerateCodeChallenge(codeVerifier)
+
 		sess, _ := a.session.Get(ctx)
 		sess.Set("state", state)
+		sess.Set("code_verifier", codeVerifier)
 		if err := sess.Save(); err != nil {
 			errRes := model.WebResponse{
 				Message:    err.Error(),
@@ -86,8 +91,15 @@ func (a *authHandler) LoginHandler() fiber.Handler {
 			return flash.WithError(ctx, errRes.ConvertToMap()).Redirect("/login")
 		}
 
+		// Add PKCE parameters to the authorization URL
+		opts := []oauth2.AuthCodeOption{
+			oauth2.SetAuthURLParam("code_challenge", codeChallenge),
+			oauth2.SetAuthURLParam("code_challenge_method", "S256"),
+		}
+		opts = append(opts, a.authCodeOptions)
+
 		// Redirects to the OAuth2 provider consent page
-		return ctx.Redirect(a.auth.AuthCodeURL(state, a.authCodeOptions))
+		return ctx.Redirect(a.auth.AuthCodeURL(state, opts...))
 	}
 }
 
@@ -105,9 +117,16 @@ func (a *authHandler) CallbackHandler() fiber.Handler {
 		}
 
 		code := ctx.Query("code")
+		codeVerifier := sess.Get("code_verifier").(string)
+
+		// Add PKCE code verifier to the token exchange
+		opts := []oauth2.AuthCodeOption{
+			oauth2.SetAuthURLParam("code_verifier", codeVerifier),
+		}
+		opts = append(opts, a.authCodeOptions)
 
 		// Converting the authorization code to token
-		token, err := a.auth.Exchange(ctx.Context(), code, a.authCodeOptions)
+		token, err := a.auth.Exchange(ctx.Context(), code, opts...)
 		if err != nil {
 			log.Printf("Failed to exchange the code: %v", err)
 			errRes := model.WebResponse{
@@ -147,8 +166,8 @@ func (a *authHandler) CallbackHandler() fiber.Handler {
 
 func (a *authHandler) LogoutHandler() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		ctx.ClearCookie(a.authCookieKey)
-		// TODO: Implement OIDC logout
+		ctx.ClearCookie()
+		//logoutUrl, _ := a.auth.LogoutURL() // TODO: Implement it in a better way
 		return ctx.Redirect("/login")
 	}
 }
