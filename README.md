@@ -1,9 +1,16 @@
 # 🤖 NeoShare
 
-![](https://img.shields.io/badge/Go-00ADD8.svg?style=for-the-badge&logo=Go&logoColor=white)
+[![Go version](https://img.shields.io/badge/Go-1.22+-00ADD8?style=for-the-badge&logo=go)](https://pkg.go.dev/github.com/gowebly/gowebly/v2)
+[![Go report](https://img.shields.io/badge/Go_report-A+-success?style=for-the-badge&logo=none)](https://goreportcard.com/report/github.com/XxThunderBlastxX/neoshare)
+[![GitHub tag](https://img.shields.io/github/v/tag/xxthunderblastxx/neoshare?style=for-the-badge&logo=none)](https://github.com/xxthunderblastxx/neoshare/releases/)
+[![License](https://img.shields.io/github/license/xxthunderblastxx/neoshare?style=for-the-badge&logo=none)](https://github.com/xxthunderblastxx/neoshare/blob/main/LICENCE)
+[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?style=for-the-badge&logo=gitpod)](https://gitpod.io/github.com/xxthunderblastxx/neoshare)
 
 ## 💡 Overview
-NeoShare is a self-hosted file sharing service hassle-free with a single downloadable link.
+NeoShare is a self-hosted hassle-free file sharing service with a single downloadable link.
+
+![](./public/login_page.png)
+![](./public/upload_page.png)
 
 ## 🤔 Why NeoShare ?
 There are many file sharing services available in the market, but none is like NeoShare.
