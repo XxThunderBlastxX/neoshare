@@ -1,10 +1,12 @@
 package auth
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/url"
 	"strings"
 
 	"github.com/coreos/go-oidc/v3/oidc"
@@ -83,13 +85,19 @@ func (a *Authenticator) JwksUri() (string, error) {
 	return data["jwks_uri"].(string), nil
 }
 
-func (a *Authenticator) LogoutURL() (string, error) {
-	data, err := a.parseWellKnown()
-	if err != nil {
-		return "", err
-	}
+func (a *Authenticator) LogoutURL(token string) string {
+	data, _ := a.parseWellKnown()
 
-	return data["end_session_endpoint"].(string) + fmt.Sprintf("?client_id=%s", a.ClientID), nil
+	var buff bytes.Buffer
+	buff.WriteString(data["end_session_endpoint"].(string))
+	v := url.Values{
+		"client_id":                {a.ClientID},
+		"token":                    {token},
+		"post_logout_redirect_uri": {a.AuthConfig.LogoutCallbackURL},
+	}
+	buff.WriteString(fmt.Sprintf("?%s", v.Encode()))
+
+	return buff.String()
 }
 
 func (a *Authenticator) VerifyUserInfo(token string) (bool, error) {

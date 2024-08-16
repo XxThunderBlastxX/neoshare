@@ -11,12 +11,13 @@ type AppConfig struct {
 }
 
 type AuthConfig struct {
-	ClientId     string `env:"AUTH_CLIENT_ID"`
-	ClientSecret string `env:"AUTH_CLIENT_SECRET"`
-	CallbackURL  string `env:"AUTH_CALLBACK_URL"`
-	Domain       string `env:"AUTH_DOMAIN"`
-	Audience     string `env:"AUTH_AUDIENCE"`
-	UserInfoURL  string `env:"AUTH_USER_INFO_URL"`
+	ClientId          string `env:"AUTH_CLIENT_ID"`
+	ClientSecret      string `env:"AUTH_CLIENT_SECRET"`
+	CallbackURL       string `env:"AUTH_CALLBACK_URL"`
+	Domain            string `env:"AUTH_DOMAIN"`
+	Audience          string `env:"AUTH_AUDIENCE"`
+	UserInfoURL       string `env:"AUTH_USER_INFO_URL"`
+	LogoutCallbackURL string `env:"AUTH_LOGOUT_CALLBACK_URL"`
 }
 
 type S3Config struct {

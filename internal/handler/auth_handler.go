@@ -29,6 +29,7 @@ type AuthHandler interface {
 	LogoutHandler() fiber.Handler
 
 	LoginView() fiber.Handler
+	LogoutCallbackHandler() fiber.Handler
 }
 
 func NewAuthHandler(sess *session.Session, auth *auth.Authenticator, authAudience string, authCookieKey string) AuthHandler {
@@ -166,8 +167,17 @@ func (a *authHandler) CallbackHandler() fiber.Handler {
 
 func (a *authHandler) LogoutHandler() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		ctx.ClearCookie()
-		//logoutUrl, _ := a.auth.LogoutURL() // TODO: Implement it in a better way
+		authCookie := ctx.Cookies(a.authCookieKey)
+		return ctx.Redirect(a.auth.LogoutURL(authCookie))
+	}
+}
+
+func (a *authHandler) LogoutCallbackHandler() fiber.Handler {
+	return func(ctx *fiber.Ctx) error {
+		// Deletes the cookie
+		ctx.ClearCookie() // TODO: Check if this is the correct way to delete the cookie
+
+		// Redirects to the login page
 		return ctx.Redirect("/login")
 	}
 }

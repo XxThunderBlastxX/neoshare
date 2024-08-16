@@ -19,6 +19,7 @@ func (r *Router) AuthRouter() {
 	api.Get("/login", authHandler.LoginHandler())
 	api.Get("/callback", authHandler.CallbackHandler())
 	api.Get("/logout", authHandler.LogoutHandler())
+	api.Get("/logout/callback", authHandler.LogoutCallbackHandler())
 
 	// View Routes
 	view.Get("/login", authHandler.LoginView())
