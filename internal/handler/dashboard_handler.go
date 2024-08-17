@@ -106,7 +106,7 @@ func (d *dashboardHandler) UploadHandler() fiber.Handler {
 		}
 
 		// Rendering the short link view page
-		render := adaptor.HTTPHandler(templ.Handler(component.ShortLinkView(ctx.BaseURL() + "/" + key)))
+		render := adaptor.HTTPHandler(templ.Handler(component.ShortLinkView(ctx.BaseURL() + "/v/" + key)))
 		return render(ctx)
 	}
 }
