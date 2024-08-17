@@ -25,6 +25,7 @@ tmp/
 # Miscelleneous file
 .env
 *.log
+node_modules
 
 # Project build
 main
@@ -32,3 +33,5 @@ main
 style.css
 bin/
 dist/
+static/
+.parcel-cache
