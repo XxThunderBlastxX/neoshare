@@ -6,6 +6,9 @@ README.md
 .air.toml
 .golangci.yaml
 .env.example
+.parcel-cache
+.gitpod.yml
+.gitpod.Dockerfile
 
 # JetBrains
 .idea
