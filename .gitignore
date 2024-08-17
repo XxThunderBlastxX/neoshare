@@ -30,7 +30,6 @@ node_modules
 # Project build
 main
 *templ.go
-style.css
 bin/
 dist/
 static/
