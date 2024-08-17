@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/favicon"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
 
@@ -61,6 +62,11 @@ func (r *Router) RegisterRoutes() {
 
 	// Setting up the rate limiter middleware
 	r.app.Use(r.middleware.RateLimiter())
+
+	// Redirecting the root path to the login page
+	r.app.Get("/", func(ctx *fiber.Ctx) error {
+		return ctx.Redirect("/login")
+	})
 
 	// Registering the routes
 	r.AuthRouter()
