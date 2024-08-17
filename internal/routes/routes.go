@@ -2,13 +2,10 @@ package routes
 
 import (
 	"context"
-	"net/http"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/favicon"
-	"github.com/gofiber/fiber/v2/middleware/filesystem"
 
-	"github.com/XxThunderBlastxX/neoshare/cmd/web"
 	"github.com/XxThunderBlastxX/neoshare/internal/auth"
 	"github.com/XxThunderBlastxX/neoshare/internal/middleware"
 	"github.com/XxThunderBlastxX/neoshare/internal/repository"
@@ -48,11 +45,9 @@ func (r *Router) RegisterRoutes() {
 	r.app.Use(r.middleware.StyledLogger(r.app.Config.AppEnv))
 
 	// Serve static files
-	r.app.Use("/assets", filesystem.New(filesystem.Config{
-		Root:       http.FS(web.Files),
-		PathPrefix: "assets",
-		Browse:     false,
-	}))
+	r.app.Static("/assets", "./cmd/web/assets", fiber.Static{
+		Browse: false,
+	})
 
 	// Setting favicon for the application
 	r.app.Use(favicon.New(favicon.Config{
