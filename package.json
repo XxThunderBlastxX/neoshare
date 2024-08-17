@@ -1,0 +1,13 @@
+{
+  "name": "neoshare",
+  "description": "Frontend part of the Neoshare project.",
+  "license": "MIT",
+  "packageManager": "bun",
+  "scripts": {
+    "fmt": "biome format --write ."
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@biomejs/biome": "1.8.3"
+  }
+}

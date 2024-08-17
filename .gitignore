@@ -25,6 +25,7 @@ tmp/
 # Miscelleneous file
 .env
 *.log
+node_modules
 
 # Project build
 main
