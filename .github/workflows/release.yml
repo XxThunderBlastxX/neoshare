@@ -43,6 +43,10 @@ jobs:
         shell: bash
         run: templ generate -path .
 
+      - name: Get bun dependencies
+        shell: bash
+        run: bun install
+
       - name: Build CSS files
         shell: bash
         run: bun run build
