@@ -43,9 +43,9 @@ jobs:
         shell: bash
         run: templ generate -path .
 
-      - name: Build CSS file
+      - name: Build CSS files
         shell: bash
-        run: bunx tailwindcss -i cmd/web/assets/css/input.css -o cmd/web/assets/css/style.css
+        run: bun run build
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6

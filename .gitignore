@@ -33,3 +33,5 @@ main
 style.css
 bin/
 dist/
+static/
+.parcel-cache

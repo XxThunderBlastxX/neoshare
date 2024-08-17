@@ -1,13 +1,19 @@
 {
   "name": "neoshare",
-  "description": "Frontend part of the Neoshare project.",
   "license": "MIT",
-  "packageManager": "bun",
+  "packageManager": "bun@1.1.22",
   "scripts": {
-    "fmt": "biome format --write ."
+    "fmt": "biome format --write .",
+    "build": "parcel build ./cmd/web/assets/css/style.css --dist-dir ./static",
+    "dev": "parcel build ./cmd/web/assets/css/style.css --dist-dir ./static --no-optimize",
+    "watch": "parcel watch ./cmd/web/assets/css/style.css --dist-dir ./static --no-optimize"
   },
-  "dependencies": {},
   "devDependencies": {
-    "@biomejs/biome": "1.8.3"
+    "@biomejs/biome": "1.8.3",
+    "autoprefixer": "^10.4.20",
+    "daisyui": "^4.12.10",
+    "parcel": "^2.12.0",
+    "postcss": "^8.4.41",
+    "tailwindcss": "^3.4.10"
   }
 }

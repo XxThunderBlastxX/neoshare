@@ -45,7 +45,7 @@ func (r *Router) RegisterRoutes() {
 	r.app.Use(r.middleware.StyledLogger(r.app.Config.AppEnv))
 
 	// Serve static files
-	r.app.Static("/assets", "./cmd/web/assets", fiber.Static{
+	r.app.Static("/static", "./static", fiber.Static{
 		Browse: false,
 	})
 
