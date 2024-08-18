@@ -86,9 +86,9 @@ You also need to setup a postgres database , preferably local or using docker. Y
 ```
 
 >[!IMPORTANT]
->**Make sure you have [TEMPL](https://github.com/a-h/templ) and [NodeJS](https://nodejs.org/en) & [PNPM](https://pnpm.io/) installed on your system. 
-> TEMPL is required to generate the `*_templ.go` files from `.templ` files & NodeJS is used to build 
-> `styles.css` file which is compiled from `tailwindcss` CLI**
+>**Make sure you have [TEMPL](https://github.com/a-h/templ) and [Bun](https://bun.sh) installed on your system. 
+> TEMPL is required to generate the `*_templ.go` files from `.templ` files & Bun is used to build and bundle
+> `styles.css` file.**
 
 - **From Docker Compose** :- You can run the application using the docker compose script provided. Also copy the `.env.example` file to `.env` and fill the environment variables. Then run the following command :- 
 
