@@ -126,11 +126,11 @@ test:
 # HELPERS
 # ==================================================================================== #
 
-## clean: Clean the binary
+## clean: Clean the binary and cache files
 .PHONY: clean
 clean:
 	@echo "Cleaning..."
-	@rm -f bin/
+	@rm -rf bin/ .parcel-cache/ node_modules/ static/
 
 ## help: Print this help message
 .PHONY: help
