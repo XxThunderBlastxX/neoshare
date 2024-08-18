@@ -73,6 +73,8 @@ dockers:
   - image_templates:
       - "ghcr.io/xxthunderblastxx/{{ .ProjectName }}:{{ .Version }}-amd64"
     dockerfile: Dockerfile
+    extra_files:
+      - static
     use: buildx
     goarch: amd64
     goos: linux
@@ -89,6 +91,8 @@ dockers:
   - image_templates:
       - "ghcr.io/xxthunderblastxx/{{ .ProjectName }}:{{ .Version }}-arm64v8"
     dockerfile: Dockerfile
+    extra_files:
+      - static
     use: buildx
     goarch: arm64
     goos: linux
