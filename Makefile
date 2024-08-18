@@ -114,7 +114,7 @@ tidy:
 .PHONY: lint
 lint:
 	@echo "Linting..."
-	@golangci-lint run
+	@golangci-lint run -v
 
 ## test: Test the application
 .PHONY: test

@@ -4,7 +4,7 @@ LICENCE
 README.md
 .gitignore
 .air.toml
-.golangci.yaml
+.golangci.yml
 .env.example
 .parcel-cache
 .gitpod.yml
