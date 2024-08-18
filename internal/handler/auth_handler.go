@@ -32,10 +32,10 @@ type AuthHandler interface {
 	LogoutCallbackHandler() fiber.Handler
 }
 
-func NewAuthHandler(sess *session.Session, authAudience, authCookieKey string) AuthHandler {
+func NewAuthHandler(sess *session.Session, auth *auth.Authenticator, authAudience, authCookieKey string) AuthHandler {
 	return &authHandler{
-		session: sess,
-		//auth:            auth,
+		session:         sess,
+		auth:            auth,
 		authCookieKey:   authCookieKey,
 		authCodeOptions: oauth2.SetAuthURLParam("audience", authAudience),
 	}
