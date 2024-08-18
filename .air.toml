@@ -4,8 +4,10 @@ tmp_dir = "bin"
 
 [build]
   args_bin = []
+  pre_cmd = ["bun install"]
   bin = "bin/neoshare"
   cmd = "make build"
+  post_cmd = []
   delay = 100
   exclude_dir = ["tmp", "bin", "testdata", "node_modules"]
   exclude_file = []
@@ -20,8 +22,6 @@ tmp_dir = "bin"
   log = "build-errors.log"
   poll = false
   poll_interval = 0
-  post_cmd = []
-  pre_cmd = []
   rerun = false
   rerun_delay = 500
   send_interrupt = false
