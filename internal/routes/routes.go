@@ -27,7 +27,7 @@ type Router struct {
 func New(app *server.Server) *Router {
 	authCookieKey := "auth_token"
 	s3Service := service.New(&app.Config.S3Config)
-	fileService := service.NewFileService(context.Background(), repository.New(app.Db), app.Db, s3Service)
+	fileService := service.NewFileService(context.Background(), repository.New(app.DB), app.DB, s3Service)
 
 	return &Router{
 		app:           app,

@@ -23,7 +23,7 @@ type Server struct {
 
 	Authenticator *auth.Authenticator
 
-	Db *sql.DB
+	DB *sql.DB
 }
 
 func New() *Server {
@@ -36,7 +36,7 @@ func New() *Server {
 
 	db := database.MustConnectDB(&c.DBConfig)
 
-	icon, _ := utils.GetFavicon(c.FaviconUri)
+	icon, _ := utils.GetFavicon(c.FaviconURI)
 
 	server := &Server{
 		App: fiber.New(fiber.Config{
@@ -47,7 +47,7 @@ func New() *Server {
 		Favicon:       icon,
 		Session:       session.New(),
 		Authenticator: a,
-		Db:            db,
+		DB:            db,
 	}
 
 	return server

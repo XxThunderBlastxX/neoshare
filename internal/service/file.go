@@ -33,7 +33,7 @@ func NewFileService(ctx context.Context, query *repository.Queries, db *sql.DB, 
 	}
 }
 
-func (f *fileService) UploadFile(key string, contentType string, fileName string, object []byte) error {
+func (f *fileService) UploadFile(key, contentType, fileName string, object []byte) error {
 	tx, _ := f.db.BeginTx(f.ctx, nil)
 	f.query.WithTx(tx)
 

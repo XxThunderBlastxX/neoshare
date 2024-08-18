@@ -12,7 +12,7 @@ type Middleware struct {
 	authCookieKey string
 }
 
-func New(s *session.Session, a *auth.Authenticator, authCookieKey string, authDomain string) *Middleware {
+func New(s *session.Session, a *auth.Authenticator, authCookieKey, authDomain string) *Middleware {
 	return &Middleware{
 		session:       s,
 		auth:          a,

@@ -11,6 +11,7 @@ import (
 
 	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/go-resty/resty/v2"
+	"github.com/gofiber/fiber/v2"
 	"golang.org/x/oauth2"
 
 	"github.com/XxThunderBlastxX/neoshare/internal/config"
@@ -34,7 +35,7 @@ func New(authConfig *config.AuthConfig) (*Authenticator, error) {
 	}
 
 	conf := oauth2.Config{
-		ClientID:     authConfig.ClientId,
+		ClientID:     authConfig.ClientID,
 		ClientSecret: authConfig.ClientSecret,
 		RedirectURL:  authConfig.CallbackURL,
 		Endpoint:     provider.Endpoint(),
@@ -62,22 +63,22 @@ func (a *Authenticator) VerifyIDToken(ctx context.Context, token *oauth2.Token) 
 	return a.Verifier(oidcConfig).Verify(ctx, rawIDToken)
 }
 
-func (a *Authenticator) parseWellKnown() (map[string]interface{}, error) {
-	wellKnownUrl := strings.TrimSuffix(a.AuthConfig.Domain, "/") + "/.well-known/openid-configuration"
-	var data map[string]interface{}
+func (a *Authenticator) parseWellKnown() (map[string]any, error) {
+	wellKnownURL := strings.TrimSuffix(a.AuthConfig.Domain, "/") + "/.well-known/openid-configuration"
+	var data map[string]any
 
 	client := resty.New()
-	res, err := client.R().Get(wellKnownUrl)
+	res, err := client.R().Get(wellKnownURL)
 	if err != nil {
 		return nil, err
 	}
 	defer res.RawBody().Close()
 
-	json.Unmarshal(res.Body(), &data)
+	_ = json.Unmarshal(res.Body(), &data)
 	return data, nil
 }
 
-func (a *Authenticator) JwksUri() (string, error) {
+func (a *Authenticator) JwksURI() (string, error) {
 	data, err := a.parseWellKnown()
 	if err != nil {
 		return "", err
@@ -101,16 +102,16 @@ func (a *Authenticator) LogoutURL(token string) string {
 }
 
 func (a *Authenticator) VerifyUserInfo(token string) (bool, error) {
-	userInfoUri := a.AuthConfig.UserInfoURL
+	userInfoURI := a.AuthConfig.UserInfoURL
 
 	client := resty.New()
 	client.Header.Set("Authorization", "Bearer "+token)
-	res, err := client.R().Get(userInfoUri)
+	res, err := client.R().Get(userInfoURI)
 	if err != nil {
 		return false, err
 	}
 
-	if res.StatusCode() != 200 {
+	if res.StatusCode() != fiber.StatusOK {
 		return false, errors.New("failed to get user info")
 	}
 

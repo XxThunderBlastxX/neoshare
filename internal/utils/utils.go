@@ -4,14 +4,15 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"encoding/base64"
-	mathRand "math/rand"
+	"math/big"
 	"strings"
 	"unicode"
 )
 
 // GenerateRandomState generates a random state string
 func GenerateRandomState() (string, error) {
-	b := make([]byte, 32)
+	const randomStateSize = 32
+	b := make([]byte, randomStateSize)
 	_, err := rand.Read(b)
 	if err != nil {
 		return "", err
@@ -22,8 +23,8 @@ func GenerateRandomState() (string, error) {
 	return state, nil
 }
 
-// RemoveNonAsciiValue removes non-ascii or non-printable characters from a string
-func RemoveNonAsciiValue(s string) string {
+// RemoveNonASCIIValue removes non-ascii or non-printable characters from a string
+func RemoveNonASCIIValue(s string) string {
 	s = strings.Map(func(r rune) rune {
 		if unicode.IsPrint(r) {
 			return r
@@ -40,7 +41,8 @@ func GenerateCodeVerifier() string {
 
 	b := make([]byte, length)
 	for i := range b {
-		b[i] = charset[mathRand.Intn(len(charset))]
+		n, _ := rand.Int(rand.Reader, big.NewInt(int64(len(charset))))
+		b[i] = charset[n.Int64()]
 	}
 	return string(b)
 }

@@ -138,7 +138,7 @@ func (d *dashboardHandler) DownloadHandler() fiber.Handler {
 			})
 		}
 		ctx.Set("Content-Type", contentType)
-		ctx.Set("content-Disposition", fmt.Sprintf("filename=\"%s\"", filename))
+		ctx.Set("content-Disposition", fmt.Sprintf("filename=\"%q\"", filename))
 
 		return ctx.Status(fiber.StatusOK).Send(file)
 	}

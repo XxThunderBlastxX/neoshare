@@ -5,14 +5,14 @@ import "github.com/XxThunderBlastxX/goconfigenv"
 type AppConfig struct {
 	AppEnv     string `env:"APP_ENV,default=dev"` // This is either dev or prod (default: dev)
 	Port       int    `env:"PORT,default=8080"`
-	FaviconUri string `env:"FAVICON_URI,default=https://koustav.dev/favicon.ico"`
+	FaviconURI string `env:"FAVICON_URI,default=https://koustav.dev/favicon.ico"`
 	Auth       AuthConfig
 	S3Config   S3Config
 	DBConfig   DBConfig
 }
 
 type AuthConfig struct {
-	ClientId          string `env:"AUTH_CLIENT_ID"`
+	ClientID          string `env:"AUTH_CLIENT_ID"`
 	ClientSecret      string `env:"AUTH_CLIENT_SECRET"`
 	CallbackURL       string `env:"AUTH_CALLBACK_URL"`
 	Domain            string `env:"AUTH_DOMAIN"`

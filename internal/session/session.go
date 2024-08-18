@@ -13,7 +13,7 @@ func New() *Session {
 		CookieSecure:   true,
 		CookieHTTPOnly: false,
 	})
-	sess.RegisterType(map[string]interface{}{})
+	sess.RegisterType(map[string]any{})
 
 	return &Session{Store: sess}
 }

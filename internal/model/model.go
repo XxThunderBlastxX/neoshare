@@ -8,15 +8,15 @@ type WebResponse struct {
 	Success    bool   `json:"success"`
 }
 
-func (w *WebResponse) ConvertToMap() map[string]interface{} {
-	return map[string]interface{}{
+func (w *WebResponse) ConvertToMap() map[string]any {
+	return map[string]any{
 		"message":     w.Message,
 		"status_code": w.StatusCode,
 		"success":     w.Success,
 	}
 }
 
-func (w *WebResponse) ConvertToStruct(m map[string]interface{}) {
+func (w *WebResponse) ConvertToStruct(m map[string]any) {
 	statusCode, _ := strconv.Atoi(m["status_code"].(string))
 	success, _ := strconv.ParseBool(m["success"].(string))
 

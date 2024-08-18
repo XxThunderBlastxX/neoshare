@@ -40,7 +40,7 @@ func New(c *config.S3Config) S3Service {
 	}
 }
 
-func (s *s3Service) UploadFile(key string, contentType string, fileName string, object []byte) error {
+func (s *s3Service) UploadFile(key, contentType, fileName string, object []byte) error {
 	uploader := manager.NewUploader(s.client, func(u *manager.Uploader) {
 		u.Concurrency = 5
 		u.S3 = s.client
@@ -49,7 +49,7 @@ func (s *s3Service) UploadFile(key string, contentType string, fileName string, 
 
 	// Defining metadata for the file.
 	metaData := map[string]string{
-		"filename": utils.RemoveNonAsciiValue(fileName),
+		"filename": utils.RemoveNonASCIIValue(fileName),
 	}
 
 	_, err := uploader.Upload(context.Background(), &s3.PutObjectInput{
@@ -106,7 +106,7 @@ func (s *s3Service) GetFiles() ([]model.File, error) {
 	return files, nil
 }
 
-func (s *s3Service) GetFileNameAndType(key string) (string, string, error) {
+func (s *s3Service) GetFileNameAndType(key string) (fileName, contentType string, err error) {
 	metaData, err := s.client.HeadObject(context.Background(), &s3.HeadObjectInput{
 		Bucket: aws.String(s.config.Bucket),
 		Key:    aws.String(key),
@@ -115,5 +115,8 @@ func (s *s3Service) GetFileNameAndType(key string) (string, string, error) {
 		return "", "", err
 	}
 
-	return metaData.Metadata["filename"], *metaData.ContentType, nil
+	fileName = metaData.Metadata["filename"]
+	contentType = *metaData.ContentType
+
+	return fileName, contentType, nil
 }

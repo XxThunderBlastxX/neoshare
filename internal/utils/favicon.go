@@ -5,10 +5,10 @@ import (
 )
 
 // GetFavicon fetches the favicon from the given uri
-func GetFavicon(faviconUri string) ([]byte, error) {
+func GetFavicon(faviconURI string) ([]byte, error) {
 	client := resty.New()
 
-	res, err := client.R().Get(faviconUri)
+	res, err := client.R().Get(faviconURI)
 	if err != nil {
 		return nil, err
 	}
