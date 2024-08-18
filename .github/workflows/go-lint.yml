@@ -12,6 +12,12 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: '1.22.x'
+      - name: Install templ
+        shell: bash
+        run: go install github.com/a-h/templ/cmd/templ@latest
+      - name: Run templ generate
+        shell: bash
+        run: templ generate -path .
       - run: go mod tidy
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v6
