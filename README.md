@@ -27,6 +27,7 @@ There are many file sharing services available in the market, but none is like N
 - [HyperScript](https://hyperscript.org)
 - [TailwindCSS](https://tailwindcss.com)
 - [DaisyUI](https://daisyui.com)
+- [Bun](https://bun.sh)
 - [Postgres](https://www.postgresql.org)
 
 ## Environment Variables
