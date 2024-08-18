@@ -3,7 +3,7 @@ version: '3.8'
 services:
   api:
     container_name: neoshare_api
-    image: ghcr.io/xxthunderblastxx/neoshare:0.2.1
+    image: ghcr.io/xxthunderblastxx/neoshare:latest
     networks:
       - neoshare
     environment:
@@ -13,7 +13,7 @@ services:
 
       - AUTH_CLIENT_ID=${AUTH_CLIENT_ID}
       - AUTH_CLIENT_SECRET=${AUTH_CLIENT_SECRET}
-      - AUTH_CALLBACK_URL=${AUTH_CALLBACK_URL}
+      - AUTH_CALLBACK_URL${AUTH_CALLBACK_URL}
       - AUTH_DOMAIN=${AUTH_DOMAIN}
       - AUTH_AUDIENCE=${AUTH_AUDIENCE}
       - AUTH_USER_INFO_URL=${AUTH_USER_INFO_URL}
@@ -28,7 +28,7 @@ services:
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_PORT=5432
-      - DB_HOST=neoshare_psql
+      - DB_HOST=localhost
     ports:
       - "${PORT}:8080"
     depends_on:
@@ -44,6 +44,8 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     networks:
       - neoshare
+    ports:
+      - "${DB_PORT}:5432"
     volumes:
       - psql_volume:/var/lib/postgresql/data
 
