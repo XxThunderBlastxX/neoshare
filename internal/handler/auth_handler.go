@@ -2,6 +2,7 @@ package handler
 
 import (
 	"log"
+	"time"
 
 	"github.com/a-h/templ"
 	"github.com/gofiber/fiber/v2"
@@ -174,8 +175,13 @@ func (a *authHandler) LogoutHandler() fiber.Handler {
 
 func (a *authHandler) LogoutCallbackHandler() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
+		const clearCookieTime = 24
 		// Deletes the cookie
-		ctx.ClearCookie() // TODO: Check if this is the correct way to delete the cookie
+		ctx.Cookie(&fiber.Cookie{
+			Name:    a.authCookieKey,
+			Value:   "",
+			Expires: time.Now().Add(-time.Hour * clearCookieTime),
+		})
 
 		// Redirects to the login page
 		return ctx.Redirect("/login")
