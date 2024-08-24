@@ -22,6 +22,7 @@ type FileService interface {
 	DownloadFile(key string) ([]byte, error)
 	SyncFileWithDB(file model.File) error
 	GetFiles() ([]model.File, error)
+	DeleteFile(key string) error
 }
 
 func NewFileService(ctx context.Context, query *repository.Queries, db *sql.DB, service S3Service) FileService {
@@ -95,4 +96,23 @@ func (f *fileService) GetFiles() ([]model.File, error) {
 	}
 
 	return files, nil
+}
+
+func (f *fileService) DeleteFile(key string) error {
+	tx, _ := f.db.BeginTx(f.ctx, nil)
+	f.query.WithTx(tx)
+
+	err := f.query.DeleteProjectByKey(f.ctx, key)
+	if err != nil {
+		log.Println("Error deleting file from DB :", err)
+		return err
+	}
+
+	err = f.s3Service.DeleteFile(key)
+	if err != nil {
+		_ = tx.Rollback()
+		return err
+	}
+
+	return tx.Commit()
 }

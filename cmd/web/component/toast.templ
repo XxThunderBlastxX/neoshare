@@ -4,7 +4,7 @@ import "strconv"
 
 // TODO: Refactor to use the toast as a resuable component
 templ SuccessToast(msg string) {
-	<div class={ "toast" , templ.KV("hidden", msg == "") }>
+	<div class={ "toast z-20" , templ.KV("hidden", msg == "") }>
 		<div class="alert alert-success">
 			<button class="text-3xl font-white" _="on click remove the closest <div/>">
 				×
@@ -15,7 +15,7 @@ templ SuccessToast(msg string) {
 }
 
 templ ErrorToast(msg string, errorCode int) {
-	<div class="toast">
+	<div class="toast z-20">
 		<div class="alert alert-error">
 			<button class="text-3xl font-white" _="on click remove the closest <div/>">
 				×

@@ -24,6 +24,7 @@ type S3Service interface {
 	DownloadFile(key string) ([]byte, error)
 	GetFiles() ([]model.File, error)
 	GetFileNameAndType(key string) (string, string, error)
+	DeleteFile(key string) error
 }
 
 func New(c *config.S3Config) S3Service {
@@ -119,4 +120,16 @@ func (s *s3Service) GetFileNameAndType(key string) (fileName, contentType string
 	contentType = *metaData.ContentType
 
 	return fileName, contentType, nil
+}
+
+func (s *s3Service) DeleteFile(key string) error {
+	_, err := s.client.DeleteObject(context.Background(), &s3.DeleteObjectInput{
+		Bucket: aws.String(s.config.Bucket),
+		Key:    aws.String(key),
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

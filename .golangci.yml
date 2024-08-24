@@ -49,6 +49,7 @@ linters-settings:
     excludes:
       - G101
       - G103
+      - G115
 
   errorlint:
     asserts: false

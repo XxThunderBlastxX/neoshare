@@ -11,6 +11,7 @@ func (r *Router) DashboardRouter() {
 	// API Routes
 	api.Post("/upload", r.middleware.VerifyToken(), h.UploadHandler())
 	api.Get("/download/:key", h.DownloadHandler())
+	api.Delete("/delete/:key", h.DeleteFileHandler())
 
 	// View Routes
 	view.Get("/dashboard", r.middleware.VerifyToken(), h.DashboardView())

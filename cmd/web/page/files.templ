@@ -8,31 +8,44 @@ import (
 
 templ FilesPage(files []model.File, message ...model.WebResponse) {
 	@layout.Base(true, message...) {
-		<section>
-			if len(files) == 0 {
-				<div class="px-12 flex justify-center items-center h-screen">
-					<h1 class="text-3xl">No files found</h1>
-				</div>
-			} else {
-				<div class="overflow-x-auto px-12">
-					<table class="table">
-						<thead>
-							<tr>
-								<th></th>
-								<th>Name</th>
-								<th>Key</th>
-								<th>Size</th>
-								<th>Last Modified</th>
-							</tr>
-						</thead>
-						<tbody>
-							for idx , file := range files {
-								@component.TableRow(file, idx+1)
-							}
-						</tbody>
-					</table>
-				</div>
-			}
-		</section>
+		@FilesSection(files)
 	}
+}
+
+templ FilesSection(files []model.File, message ...model.WebResponse) {
+	<section id="files-view">
+        if len(files) == 0 {
+            <div class="px-12 flex justify-center items-center h-screen">
+                <h1 class="text-3xl">No files found</h1>
+            </div>
+        } else {
+            <div class="overflow-x-auto px-12">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Name</th>
+                            <th>Key</th>
+                            <th>Size</th>
+                            <th>Last Modified</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        for idx , file := range files {
+                            @component.TableRow(file, idx+1)
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        for _, msg := range message {
+            switch msg.Success {
+                case true:
+                    @component.SuccessToast(msg.Message)
+                case false:
+                    @component.ErrorToast(msg.Message, msg.StatusCode)
+                default:
+            }
+        }
+    </section>
 }

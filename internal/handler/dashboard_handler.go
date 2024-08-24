@@ -27,6 +27,7 @@ type dashboardHandler struct {
 type DashboardHandler interface {
 	UploadHandler() fiber.Handler
 	DownloadHandler() fiber.Handler
+	DeleteFileHandler() fiber.Handler
 
 	DashboardView() fiber.Handler
 	FilesView() fiber.Handler
@@ -160,6 +161,51 @@ func (d *dashboardHandler) FilesView() fiber.Handler {
 
 		// Rendering the files view page
 		render := adaptor.HTTPHandler(templ.Handler(page.FilesPage(files)))
+		return render(ctx)
+	}
+}
+
+func (d *dashboardHandler) DeleteFileHandler() fiber.Handler {
+	return func(ctx *fiber.Ctx) error {
+		fileKey := ctx.Params("key")
+
+		if fileKey == "" {
+			log.Printf("File key is empty")
+			render := adaptor.HTTPHandler(templ.Handler(page.FilesPage([]model.File{}, model.WebResponse{
+				Message:    "File key is empty",
+				StatusCode: fiber.StatusBadRequest,
+				Success:    false,
+			})))
+			return render(ctx)
+		}
+
+		err := d.fileService.DeleteFile(fileKey)
+		if err != nil {
+			log.Printf("Error occurred while deleting the file: %v", err)
+			render := adaptor.HTTPHandler(templ.Handler(page.FilesPage([]model.File{}, model.WebResponse{
+				Message:    err.Error(),
+				StatusCode: fiber.StatusInternalServerError,
+				Success:    false,
+			})))
+			return render(ctx)
+		}
+
+		files, err := d.fileService.GetFiles()
+		if err != nil {
+			log.Printf("Error occurred while fetching the files: %v", err)
+			render := adaptor.HTTPHandler(templ.Handler(page.FilesPage([]model.File{}, model.WebResponse{
+				Message:    err.Error(),
+				StatusCode: fiber.StatusInternalServerError,
+				Success:    false,
+			})))
+			return render(ctx)
+		}
+
+		render := adaptor.HTTPHandler(templ.Handler(page.FilesSection(files, model.WebResponse{
+			Message:    "File deleted successfully",
+			StatusCode: fiber.StatusOK,
+			Success:    true,
+		})))
 		return render(ctx)
 	}
 }
