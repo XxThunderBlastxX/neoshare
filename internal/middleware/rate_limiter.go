@@ -14,8 +14,8 @@ func (m *Middleware) RateLimiter() fiber.Handler {
 		Next: func(c *fiber.Ctx) bool {
 			return c.IP() == "127.0.0.1"
 		},
-		Max:        5,
-		Expiration: 1 * time.Minute,
+		Max:        80,
+		Expiration: 30 * time.Second,
 		LimitReached: func(c *fiber.Ctx) error {
 			return c.Status(fiber.StatusTooManyRequests).JSON(model.WebResponse{
 				Success:    false,
