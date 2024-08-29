@@ -13,7 +13,7 @@ services:
 
       - AUTH_CLIENT_ID=${AUTH_CLIENT_ID}
       - AUTH_CLIENT_SECRET=${AUTH_CLIENT_SECRET}
-      - AUTH_CALLBACK_URL${AUTH_CALLBACK_URL}
+      - AUTH_CALLBACK_URL=${AUTH_CALLBACK_URL}
       - AUTH_DOMAIN=${AUTH_DOMAIN}
       - AUTH_AUDIENCE=${AUTH_AUDIENCE}
       - AUTH_USER_INFO_URL=${AUTH_USER_INFO_URL}
@@ -24,11 +24,11 @@ services:
       - S3_SECRET_KEY=${S3_SECRET_KEY}
       - S3_BUCKET=${S3_BUCKET}
 
-      - DB_DATABASE=neoshare
+      - DB_DATABASE=${DB_DATABASE}
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
-      - DB_PORT=5432
-      - DB_HOST=localhost
+      - DB_PORT=${DB_PORT}
+      - DB_HOST=${DB_HOST}
     ports:
       - "${PORT}:8080"
     depends_on:
@@ -44,6 +44,11 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     networks:
       - neoshare
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     ports:
       - "${DB_PORT}:5432"
     volumes:
